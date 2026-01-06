@@ -1,275 +1,364 @@
 """
-OmniRenovation AI - Phase 1 Pilot v7
-With AI-generated design images and real product matching
+OmniRenovation AI - Phase 1 Pilot v8b
+- No Replicate dependency (Python 3.14 compatible)
+- Uses OpenAI DALL-E 3 for design generation (optional)
+- SerpAPI for real product search with actual links
 """
 
 import streamlit as st
 import streamlit.components.v1 as components
 import anthropic
-import openai
+import requests
 import json
 import base64
+import re
+import struct
 from datetime import datetime
 from io import BytesIO
 from PIL import Image
-import struct
-import requests
-import re
+from urllib.parse import quote_plus
+
+# Optional OpenAI import
+try:
+    import openai
+
+    OPENAI_AVAILABLE = True
+except ImportError:
+    OPENAI_AVAILABLE = False
 
 # Page config
 st.set_page_config(page_title="OmniRenovation AI", page_icon="🏠", layout="wide")
 
 # Initialize session state
+DEFAULT_STATE = {
+    "phase": "upload",
+    "images": [],
+    "preferences": {},
+    "valuation": None,
+    "designs": None,
+    "design_images": {},
+    "selected_design": None,
+    "selected_design_image": None,
+    "furniture_items": [],
+    "product_matches": {},
+    "selected_products": {},
+    "bom": None,
+    "has_3d_scan": False,
+    "scan_metadata": None,
+    "glb_base64": None,
+}
+
 if "project_state" not in st.session_state:
-    st.session_state.project_state = {
-        "phase": "upload",
-        "images": [],
-        "preferences": {},
-        "valuation": None,
-        "designs": None,
-        "design_images": {},  # Generated design images
-        "selected_design": None,
-        "furniture_items": [],  # Segmented furniture
-        "product_matches": {},  # Real product matches
-        "bom": None,
-        "gate_1_approved": False,
-        "gate_2_approved": False,
-        "has_3d_scan": False,
-        "scan_metadata": None,
-        "glb_base64": None,
-    }
-
-
-# ============== 3D VIEWER HTML ==============
-
-
-def create_3d_viewer_html(glb_base64: str, height: int = 500) -> str:
-    """Create Three.js viewer for GLB files"""
-    html = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <style>
-            body {{ margin: 0; padding: 0; overflow: hidden; }}
-            #container {{ 
-                width: 100%; 
-                height: {height}px; 
-                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-                border-radius: 10px;
-            }}
-            #loading {{
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                color: white;
-                font-family: Arial, sans-serif;
-            }}
-            #controls {{
-                position: absolute;
-                bottom: 10px;
-                left: 50%;
-                transform: translateX(-50%);
-                color: white;
-                font-family: Arial, sans-serif;
-                font-size: 12px;
-                background: rgba(0,0,0,0.5);
-                padding: 8px 16px;
-                border-radius: 20px;
-            }}
-            #info {{
-                position: absolute;
-                top: 10px;
-                left: 10px;
-                color: white;
-                font-family: Arial, sans-serif;
-                font-size: 12px;
-                background: rgba(0,0,0,0.5);
-                padding: 8px 12px;
-                border-radius: 8px;
-            }}
-        </style>
-    </head>
-    <body>
-        <div id="container">
-            <div id="loading">Loading 3D model...</div>
-            <div id="info"></div>
-            <div id="controls">🖱️ Drag to rotate • Scroll to zoom • Right-click to pan</div>
-        </div>
-        
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-        
-        <script>
-            const glbBase64 = "{glb_base64}";
-            
-            function base64ToArrayBuffer(base64) {{
-                const binaryString = atob(base64);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {{
-                    bytes[i] = binaryString.charCodeAt(i);
-                }}
-                return bytes.buffer;
-            }}
-            
-            const container = document.getElementById('container');
-            const scene = new THREE.Scene();
-            
-            const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.set(5, 5, 5);
-            
-            const renderer = new THREE.WebGLRenderer({{ antialias: true, alpha: true }});
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.outputEncoding = THREE.sRGBEncoding;
-            container.appendChild(renderer.domElement);
-            
-            const controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            
-            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-            const light = new THREE.DirectionalLight(0xffffff, 0.8);
-            light.position.set(5, 10, 7);
-            scene.add(light);
-            
-            scene.add(new THREE.GridHelper(20, 20, 0x444444, 0x222222));
-            
-            const loader = new THREE.GLTFLoader();
-            loader.parse(base64ToArrayBuffer(glbBase64), '', 
-                function(gltf) {{
-                    const model = gltf.scene;
-                    const box = new THREE.Box3().setFromObject(model);
-                    const center = box.getCenter(new THREE.Vector3());
-                    const size = box.getSize(new THREE.Vector3());
-                    
-                    model.position.sub(center);
-                    const maxDim = Math.max(size.x, size.y, size.z);
-                    model.scale.multiplyScalar(5 / maxDim);
-                    
-                    scene.add(model);
-                    
-                    let vertexCount = 0, triangleCount = 0;
-                    model.traverse(child => {{
-                        if (child.isMesh && child.geometry.attributes.position) {{
-                            vertexCount += child.geometry.attributes.position.count;
-                            triangleCount += child.geometry.index ? 
-                                child.geometry.index.count / 3 : 
-                                child.geometry.attributes.position.count / 3;
-                        }}
-                    }});
-                    
-                    document.getElementById('info').innerHTML = 
-                        `Vertices: ${{vertexCount.toLocaleString()}}<br>Triangles: ${{Math.floor(triangleCount).toLocaleString()}}`;
-                    document.getElementById('loading').style.display = 'none';
-                }}
-            );
-            
-            function animate() {{
-                requestAnimationFrame(animate);
-                controls.update();
-                renderer.render(scene, camera);
-            }}
-            animate();
-        </script>
-    </body>
-    </html>
-    """
-    return html
+    st.session_state.project_state = DEFAULT_STATE.copy()
 
 
 # ============== API CLIENTS ==============
 
 
 def get_claude_client():
-    """Get Claude client"""
     api_key = st.secrets.get("ANTHROPIC_API_KEY") or st.session_state.get(
         "anthropic_key"
     )
-    if not api_key:
-        return None
-    return anthropic.Anthropic(api_key=api_key)
+    return anthropic.Anthropic(api_key=api_key) if api_key else None
 
 
 def get_openai_client():
-    """Get OpenAI client for DALL-E"""
-    api_key = st.secrets.get("OPENAI_API_KEY") or st.session_state.get("openai_key")
-    if not api_key:
+    if not OPENAI_AVAILABLE:
         return None
-    return openai.OpenAI(api_key=api_key)
+    api_key = st.secrets.get("OPENAI_API_KEY") or st.session_state.get("openai_key")
+    return openai.OpenAI(api_key=api_key) if api_key else None
+
+
+def get_serpapi_key():
+    return st.secrets.get("SERPAPI_KEY") or st.session_state.get("serpapi_key")
+
+
+# ============== 3D VIEWER ==============
+
+
+def create_3d_viewer_html(glb_base64: str, height: int = 400) -> str:
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ margin: 0; }}
+            #container {{ width: 100%; height: {height}px; background: linear-gradient(135deg, #1a1a2e, #16213e); border-radius: 10px; }}
+            #info {{ position: absolute; top: 10px; left: 10px; color: white; font: 12px Arial; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 8px; }}
+            #controls {{ position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); color: white; font: 12px Arial; background: rgba(0,0,0,0.5); padding: 8px 16px; border-radius: 20px; }}
+        </style>
+    </head>
+    <body>
+        <div id="container"><div id="info"></div><div id="controls">🖱️ Drag to rotate • Scroll to zoom</div></div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+        <script>
+            const container = document.getElementById('container');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(60, container.clientWidth/container.clientHeight, 0.1, 1000);
+            camera.position.set(5, 5, 5);
+            const renderer = new THREE.WebGLRenderer({{antialias: true, alpha: true}});
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.outputEncoding = THREE.sRGBEncoding;
+            container.appendChild(renderer.domElement);
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const light = new THREE.DirectionalLight(0xffffff, 0.8);
+            light.position.set(5, 10, 7);
+            scene.add(light);
+            scene.add(new THREE.GridHelper(20, 20, 0x444444, 0x222222));
+            
+            const loader = new THREE.GLTFLoader();
+            const b64 = "{glb_base64}";
+            const bin = atob(b64);
+            const bytes = new Uint8Array(bin.length);
+            for(let i=0; i<bin.length; i++) bytes[i] = bin.charCodeAt(i);
+            
+            loader.parse(bytes.buffer, '', gltf => {{
+                const model = gltf.scene;
+                const box = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                const size = box.getSize(new THREE.Vector3());
+                model.position.sub(center);
+                model.scale.multiplyScalar(5 / Math.max(size.x, size.y, size.z));
+                scene.add(model);
+                
+                let verts = 0;
+                model.traverse(c => {{ if(c.isMesh && c.geometry.attributes.position) verts += c.geometry.attributes.position.count; }});
+                document.getElementById('info').innerHTML = 'Vertices: ' + verts.toLocaleString();
+            }});
+            
+            function animate() {{ requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }}
+            animate();
+        </script>
+    </body>
+    </html>
+    """
 
 
 # ============== IMAGE PROCESSING ==============
 
 
 def extract_glb_metadata(file_bytes):
-    """Extract metadata from GLB file"""
     try:
-        magic = struct.unpack("<I", file_bytes[0:4])[0]
-        if magic != 0x46546C67:
-            return None, "Not a valid GLB file"
-
-        version = struct.unpack("<I", file_bytes[4:8])[0]
-        chunk_length = struct.unpack("<I", file_bytes[12:16])[0]
-        json_data = file_bytes[20 : 20 + chunk_length].decode("utf-8")
-        gltf = json.loads(json_data)
-
+        if struct.unpack("<I", file_bytes[0:4])[0] != 0x46546C67:
+            return None, "Invalid GLB"
+        chunk_len = struct.unpack("<I", file_bytes[12:16])[0]
+        gltf = json.loads(file_bytes[20 : 20 + chunk_len].decode("utf-8"))
         return {
-            "format": "GLB",
-            "version": version,
-            "file_size_mb": len(file_bytes) / (1024 * 1024),
             "meshes": len(gltf.get("meshes", [])),
             "materials": len(gltf.get("materials", [])),
             "textures": len(gltf.get("textures", [])),
+            "file_size_mb": len(file_bytes) / 1048576,
         }, None
     except Exception as e:
         return None, str(e)
 
 
 def process_uploaded_image(uploaded_file):
-    """Process uploaded image to base64"""
     uploaded_file.seek(0)
-    bytes_data = uploaded_file.read()
+    data = uploaded_file.read()
     uploaded_file.seek(0)
-
     try:
-        img = Image.open(BytesIO(bytes_data))
-        actual_format = img.format.lower() if img.format else "jpeg"
-
-        mime_map = {
+        img = Image.open(BytesIO(data))
+        fmt = (img.format or "jpeg").lower()
+        mime = {
             "jpeg": "image/jpeg",
             "jpg": "image/jpeg",
             "png": "image/png",
-            "gif": "image/gif",
             "webp": "image/webp",
-        }
-        mime_type = mime_map.get(actual_format, "image/jpeg")
-
-        if actual_format not in mime_map:
-            if img.mode in ("RGBA", "LA", "P"):
-                img = img.convert("RGB")
-            buffer = BytesIO()
-            img.save(buffer, format="JPEG", quality=95)
-            bytes_data = buffer.getvalue()
-            mime_type = "image/jpeg"
-
+        }.get(fmt, "image/jpeg")
+        if fmt not in ["jpeg", "jpg", "png", "webp"]:
+            buf = BytesIO()
+            img.convert("RGB").save(buf, "JPEG", quality=95)
+            data = buf.getvalue()
+            mime = "image/jpeg"
         return {
             "name": uploaded_file.name,
-            "type": mime_type,
-            "data": base64.standard_b64encode(bytes_data).decode("utf-8"),
+            "type": mime,
+            "data": base64.b64encode(data).decode(),
             "success": True,
         }
     except Exception as e:
         return {"name": uploaded_file.name, "error": str(e), "success": False}
 
 
-# ============== AI AGENTS ==============
+# ============== DESIGN GENERATION (DALL-E 3) ==============
+
+
+def generate_design_dalle(room_description: str, style: str, variation: str) -> dict:
+    """Generate design image using DALL-E 3"""
+    client = get_openai_client()
+    if not client:
+        return {"error": "OpenAI API key not configured"}
+
+    style_details = {
+        "Modern Minimalist": "clean lines, neutral colors (white, grey, beige), minimal furniture, lots of natural light, simple geometric shapes, uncluttered spaces",
+        "Scandinavian": "light wood (oak, birch), white walls, cozy textiles (wool, linen), plants, functional furniture, hygge atmosphere",
+        "Industrial": "exposed brick walls, metal fixtures, Edison bulbs, dark colors, raw materials, concrete floors, loft aesthetic",
+        "Mid-Century Modern": "retro 1950s-60s furniture, organic curves, wood and leather, bold accent colors, iconic designer pieces",
+        "Contemporary": "current trends, mixed materials, neutral base with bold accents, comfortable yet stylish",
+        "Bohemian": "eclectic patterns, rich jewel colors, layered textiles, global influences, plants everywhere",
+        "Coastal": "blue and white palette, natural textures (rattan, jute), light and airy, nautical accents",
+        "Farmhouse": "rustic wood, shiplap walls, neutral colors, vintage pieces, comfortable and welcoming",
+    }
+
+    variation_mood = {
+        "Light & Airy": "bright, spacious, lots of natural light streaming through windows, white and light colors dominate",
+        "Warm & Cozy": "warm lighting, layered textures, rich warm tones, inviting and comfortable atmosphere",
+        "Bold & Dramatic": "striking contrasts, statement furniture pieces, rich deep colors, sophisticated and memorable",
+    }
+
+    prompt = f"""Professional interior design photograph of a beautifully renovated {room_description}.
+
+Style: {style} - {style_details.get(style, style)}
+Atmosphere: {variation} - {variation_mood.get(variation, variation)}
+
+The room features carefully selected furniture, perfect lighting, styled accessories.
+Ultra realistic, high-end interior design magazine quality, 8K resolution, 
+professional architectural photography, natural lighting, detailed textures.
+
+NO people, NO text, NO watermarks, NO logos."""
+
+    try:
+        response = client.images.generate(
+            model="dall-e-3", prompt=prompt, size="1792x1024", quality="hd", n=1
+        )
+
+        image_url = response.data[0].url
+        img_response = requests.get(image_url)
+
+        if img_response.status_code == 200:
+            return {
+                "success": True,
+                "image_base64": base64.b64encode(img_response.content).decode(),
+                "prompt": prompt,
+                "revised_prompt": response.data[0].revised_prompt,
+            }
+        return {"error": "Failed to download image"}
+
+    except Exception as e:
+        return {"error": str(e)}
+
+
+# ============== SERPAPI - REAL PRODUCT SEARCH ==============
+
+
+def search_products_serpapi(query: str, max_results: int = 5) -> list:
+    """Search for real products using SerpAPI Google Shopping"""
+    api_key = get_serpapi_key()
+    if not api_key:
+        return []
+
+    try:
+        params = {
+            "engine": "google_shopping",
+            "q": query,
+            "api_key": api_key,
+            "num": max_results,
+            "hl": "en",
+            "gl": "us",
+        }
+
+        response = requests.get("https://serpapi.com/search", params=params)
+        data = response.json()
+
+        products = []
+        for item in data.get("shopping_results", [])[:max_results]:
+            products.append(
+                {
+                    "product_name": item.get("title", "Unknown"),
+                    "price": item.get("extracted_price", 0),
+                    "price_str": item.get("price", "N/A"),
+                    "retailer": item.get("source", "Unknown"),
+                    "url": item.get("product_link") or item.get("link") or "",
+                    "image_url": item.get("thumbnail", ""),
+                    "rating": item.get("rating"),
+                    "reviews": item.get("reviews"),
+                    "delivery": item.get("delivery", ""),
+                }
+            )
+
+        return products
+
+    except Exception as e:
+        st.error(f"SerpAPI error: {e}")
+        return []
+
+
+def search_products_fallback(query: str) -> list:
+    """Fallback: Generate working search URLs for major retailers"""
+    encoded = quote_plus(query)
+
+    return [
+        {
+            "product_name": f"Search on Amazon",
+            "retailer": "Amazon",
+            "url": f"https://www.amazon.com/s?k={encoded}&i=garden",
+            "price_str": "See results",
+            "image_url": "",
+        },
+        {
+            "product_name": f"Search on Wayfair",
+            "retailer": "Wayfair",
+            "url": f"https://www.wayfair.com/keyword.html?keyword={encoded}",
+            "price_str": "See results",
+            "image_url": "",
+        },
+        {
+            "product_name": f"Search on IKEA",
+            "retailer": "IKEA",
+            "url": f"https://www.ikea.com/us/en/search/?q={encoded}",
+            "price_str": "See results",
+            "image_url": "",
+        },
+        {
+            "product_name": f"Search on West Elm",
+            "retailer": "West Elm",
+            "url": f"https://www.westelm.com/search/?query={encoded}",
+            "price_str": "See results",
+            "image_url": "",
+        },
+        {
+            "product_name": f"Search on Target",
+            "retailer": "Target",
+            "url": f"https://www.target.com/s?searchTerm={encoded}",
+            "price_str": "See results",
+            "image_url": "",
+        },
+    ]
+
+
+def find_products_for_item(item: dict) -> list:
+    """Find real products for a furniture item"""
+    keywords = item.get("search_keywords", [])
+    if keywords:
+        query = keywords[0]
+    else:
+        parts = [
+            item.get("color", ""),
+            item.get("material", ""),
+            item.get("style", ""),
+            item.get("name", ""),
+        ]
+        query = " ".join([p for p in parts if p])[:80]
+
+    if get_serpapi_key():
+        products = search_products_serpapi(query, 5)
+        if products:
+            return products
+
+    return search_products_fallback(query)
+
+
+# ============== CLAUDE AGENTS ==============
 
 
 def run_valuation_agent(
     images: list, preferences: dict, scan_metadata: dict = None
 ) -> dict:
-    """Valuation Agent - analyzes property"""
     client = get_claude_client()
     if not client:
         return {"error": "Claude API key not configured"}
@@ -288,144 +377,47 @@ def run_valuation_agent(
                 }
             )
 
-    metadata_text = ""
-    if scan_metadata:
-        metadata_text = f"\n3D Scan: {scan_metadata.get('meshes', 0)} meshes, {scan_metadata.get('file_size_mb', 0):.1f}MB"
+    prompt = f"""Analyze this room for renovation.
 
-    prompt = f"""Analyze this property for renovation.{metadata_text}
+Preferences: Budget {preferences.get('budget', 'N/A')}, Style: {preferences.get('style', 'Modern')}
 
-Preferences: Budget {preferences.get('budget', 'N/A')}, Style: {preferences.get('style', 'Modern')}, 
-Goals: {preferences.get('goals', 'N/A')}, Priorities: {preferences.get('priorities', 'N/A')}
-
-Return JSON:
+Return ONLY valid JSON:
 {{
     "property_assessment": {{
-        "room_type": "living room/bedroom/kitchen/etc",
-        "room_types_identified": ["rooms"],
+        "room_type": "living room/bedroom/kitchen/bathroom/etc",
         "current_condition": "poor/fair/good",
-        "condition_details": "description",
         "square_footage_estimate": "X sq ft",
-        "current_style": "description of current style",
-        "natural_light": "poor/adequate/good/excellent"
+        "current_style": "description",
+        "natural_light": "poor/adequate/good/excellent",
+        "notable_features": ["feature1", "feature2"]
     }},
     "renovation_scope": {{
-        "recommended_work": [{{"area": "name", "work_needed": "desc", "priority": "high/medium/low"}}],
-        "quick_wins": ["wins"]
+        "recommended_work": [{{"area": "name", "work": "description", "priority": "high/medium/low"}}]
     }},
     "cost_estimate": {{
-        "low_estimate": 0, "mid_estimate": 0, "high_estimate": 0,
-        "breakdown": [{{"category": "name", "low": 0, "high": 0}}]
-    }},
-    "roi_analysis": {{"estimated_value_increase": 0, "roi_percentage": 0}},
-    "timeline_estimate": {{"minimum_weeks": 0, "maximum_weeks": 0}}
+        "low": 0, "mid": 0, "high": 0
+    }}
 }}"""
 
-    if image_content:
-        image_content.append({"type": "text", "text": prompt})
-        messages = [{"role": "user", "content": image_content}]
-    else:
-        messages = [{"role": "user", "content": prompt}]
+    content = (
+        image_content + [{"type": "text", "text": prompt}] if image_content else prompt
+    )
 
     try:
         response = client.messages.create(
-            model="claude-sonnet-4-20250514", max_tokens=4096, messages=messages
+            model="claude-sonnet-4-20250514",
+            max_tokens=2048,
+            messages=[{"role": "user", "content": content}],
         )
         text = response.content[0].text
-        json_match = re.search(r"\{[\s\S]*\}", text)
-        if json_match:
-            return json.loads(json_match.group())
-        return {"raw_response": text}
+        match = re.search(r"\{[\s\S]*\}", text)
+        return json.loads(match.group()) if match else {"raw": text}
     except Exception as e:
         return {"error": str(e)}
 
 
-def generate_design_prompt(room_info: dict, style: str, option_num: int) -> str:
-    """Generate a detailed prompt for DALL-E based on room analysis"""
-
-    style_descriptions = {
-        "Modern Minimalist": "clean lines, neutral colors, minimal furniture, open space, white walls, natural light, simple geometric shapes",
-        "Contemporary": "current trends, mixed materials, neutral with bold accents, comfortable yet stylish, artistic elements",
-        "Scandinavian": "light wood, white and grey tones, cozy textures, functional furniture, plants, hygge atmosphere, natural materials",
-        "Industrial": "exposed brick, metal fixtures, dark colors, Edison bulbs, raw materials, urban loft aesthetic, concrete elements",
-        "Mid-Century Modern": "retro 1950s-60s style, organic shapes, wood furniture, bold colors, iconic designer pieces, tapered legs",
-        "Traditional": "classic furniture, rich colors, elegant patterns, crown molding, symmetry, timeless design",
-        "Bohemian": "eclectic mix, rich colors, global patterns, layered textiles, plants, artistic, collected-over-time feel",
-        "Coastal": "beach-inspired, blue and white palette, natural textures, light and airy, nautical accents, weathered wood",
-        "Farmhouse": "rustic charm, shiplap walls, barn doors, vintage pieces, neutral colors, cozy and welcoming",
-    }
-
-    style_desc = style_descriptions.get(style, style_descriptions["Modern Minimalist"])
-    room_type = room_info.get("room_type", "living room")
-    sq_ft = room_info.get("square_footage_estimate", "medium-sized")
-
-    # Different variations for each option
-    variations = [
-        "bright and airy with emphasis on natural light",
-        "cozy and warm with layered textures",
-        "bold and dramatic with statement pieces",
-    ]
-    variation = variations[option_num % 3]
-
-    prompt = f"""Professional interior design photograph of a beautifully renovated {room_type}, {style} style.
-    
-Design characteristics: {style_desc}
-Atmosphere: {variation}
-Room size: {sq_ft}
-
-The space features carefully curated furniture, perfect lighting, styled accessories, and professional staging.
-Photorealistic, high-end interior design magazine quality, 4K, detailed textures, natural lighting from windows.
-NO people, NO text, NO watermarks."""
-
-    return prompt
-
-
-def generate_design_images(valuation: dict, preferences: dict) -> dict:
-    """Generate 3 design images using DALL-E 3"""
-    client = get_openai_client()
-    if not client:
-        return {
-            "error": "OpenAI API key not configured. Add OPENAI_API_KEY to secrets."
-        }
-
-    room_info = valuation.get("property_assessment", {})
-    style = preferences.get("style", "Modern Minimalist")
-
-    design_images = {}
-    design_names = [
-        f"{style} - Light & Airy",
-        f"{style} - Warm & Cozy",
-        f"{style} - Bold & Dramatic",
-    ]
-
-    for i in range(3):
-        try:
-            prompt = generate_design_prompt(room_info, style, i)
-
-            response = client.images.generate(
-                model="dall-e-3", prompt=prompt, size="1792x1024", quality="hd", n=1
-            )
-
-            image_url = response.data[0].url
-
-            # Download image and convert to base64
-            img_response = requests.get(image_url)
-            if img_response.status_code == 200:
-                img_base64 = base64.b64encode(img_response.content).decode("utf-8")
-                design_images[i + 1] = {
-                    "name": design_names[i],
-                    "prompt": prompt,
-                    "image_base64": img_base64,
-                    "revised_prompt": response.data[0].revised_prompt,
-                }
-
-        except Exception as e:
-            design_images[i + 1] = {"name": design_names[i], "error": str(e)}
-
-    return design_images
-
-
-def segment_furniture_from_design(design_image_base64: str, design_name: str) -> list:
-    """Use Claude to identify and segment furniture items from a design image"""
+def segment_furniture(design_image_base64: str) -> list:
+    """Identify furniture items in a design image"""
     client = get_claude_client()
     if not client:
         return []
@@ -448,35 +440,27 @@ def segment_furniture_from_design(design_image_base64: str, design_name: str) ->
                         },
                         {
                             "type": "text",
-                            "text": """Analyze this interior design image and identify ALL furniture and decor items visible.
+                            "text": """Identify ALL furniture and decor in this interior design image.
 
-For each item, provide:
-1. Item name/type
-2. Detailed description (style, color, material, approximate size)
-3. Search keywords for finding similar products online
-4. Estimated price range (USD)
-5. Position in image (left/center/right, foreground/background)
-
-Return JSON array:
+Return ONLY a JSON array:
 [
     {
         "id": 1,
         "item_type": "sofa",
         "name": "3-Seater Modern Sofa",
-        "description": "Light grey fabric, clean lines, wooden legs, approximately 84 inches wide",
+        "description": "Grey fabric sofa with wooden legs",
         "style": "mid-century modern",
-        "color": "light grey",
-        "material": "fabric upholstery, wood legs",
-        "search_keywords": ["grey modern sofa", "mid-century 3 seater sofa", "fabric sofa wooden legs"],
-        "estimated_price_low": 800,
-        "estimated_price_high": 2000,
-        "position": "center foreground",
+        "color": "grey",
+        "material": "fabric",
+        "search_keywords": ["grey modern sofa", "mid century sofa", "3 seater grey sofa"],
+        "price_estimate_low": 800,
+        "price_estimate_high": 2000,
         "importance": "primary"
     }
 ]
 
-Include ALL visible items: sofas, chairs, tables, lamps, rugs, artwork, plants, shelving, etc.
-Be specific about colors, materials, and dimensions.""",
+Include: sofas, chairs, tables, lamps, rugs, artwork, plants, shelves, curtains, etc.
+Be SPECIFIC about colors and materials for accurate product matching.""",
                         },
                     ],
                 }
@@ -484,24 +468,21 @@ Be specific about colors, materials, and dimensions.""",
         )
 
         text = response.content[0].text
-        json_match = re.search(r"\[[\s\S]*\]", text)
-        if json_match:
-            return json.loads(json_match.group())
-        return []
-
+        match = re.search(r"\[[\s\S]*\]", text)
+        return json.loads(match.group()) if match else []
     except Exception as e:
-        st.error(f"Furniture segmentation error: {e}")
+        st.error(f"Segmentation error: {e}")
         return []
 
 
-def find_real_products(furniture_item: dict) -> list:
-    """Find real products matching a furniture item using web search"""
+def generate_design_concepts(valuation: dict, preferences: dict) -> dict:
+    """Generate 3 design concept descriptions"""
     client = get_claude_client()
     if not client:
-        return []
+        return {"error": "API key not configured"}
 
-    # For MVP, we'll use Claude to generate realistic product suggestions
-    # In production, you'd use actual APIs: Google Shopping, Amazon Product API, etc.
+    room = valuation.get("property_assessment", {})
+    style = preferences.get("style", "Modern Minimalist")
 
     try:
         response = client.messages.create(
@@ -510,106 +491,40 @@ def find_real_products(furniture_item: dict) -> list:
             messages=[
                 {
                     "role": "user",
-                    "content": f"""Find 3 REAL products that match this furniture item:
-
-Item: {furniture_item.get('name', 'Unknown')}
-Description: {furniture_item.get('description', '')}
-Style: {furniture_item.get('style', '')}
-Color: {furniture_item.get('color', '')}
-Material: {furniture_item.get('material', '')}
-Price Range: ${furniture_item.get('estimated_price_low', 0)} - ${furniture_item.get('estimated_price_high', 1000)}
-
-Return JSON array with 3 REAL products from major retailers (IKEA, Wayfair, West Elm, CB2, Target, Amazon, Article, etc.):
-[
-    {{
-        "product_name": "Actual product name",
-        "retailer": "Store name",
-        "price": 599,
-        "url": "https://www.retailer.com/product-page",
-        "match_score": 95,
-        "match_notes": "Why this matches",
-        "color_options": ["Grey", "Blue", "Beige"],
-        "dimensions": "84W x 36D x 32H inches"
-    }}
-]
-
-Use REAL product names and realistic URLs (format: https://www.retailer.com/product-category/product-name).
-Prioritize popular, well-reviewed products.""",
-                }
-            ],
-        )
-
-        text = response.content[0].text
-        json_match = re.search(r"\[[\s\S]*\]", text)
-        if json_match:
-            return json.loads(json_match.group())
-        return []
-
-    except Exception as e:
-        return []
-
-
-def run_design_agent_with_images(
-    images: list, preferences: dict, valuation: dict
-) -> dict:
-    """Design Agent that generates actual design images"""
-
-    # First, generate design concepts (text)
-    client = get_claude_client()
-    if not client:
-        return {"error": "Claude API key not configured"}
-
-    room_info = valuation.get("property_assessment", {})
-    style = preferences.get("style", "Modern Minimalist")
-    budget = preferences.get("budget", "$15,000 - $30,000")
-
-    # Generate design concepts
-    try:
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=4096,
-            messages=[
-                {
-                    "role": "user",
-                    "content": f"""Create 3 distinct design concepts for this {room_info.get('room_type', 'room')}:
-
-Style: {style}
-Budget: {budget}
-Current Condition: {room_info.get('current_condition', 'N/A')}
-Room Size: {room_info.get('square_footage_estimate', 'N/A')}
+                    "content": f"""Create 3 design concepts for a {room.get('room_type', 'living room')} in {style} style.
 
 Return JSON:
 {{
     "design_options": [
         {{
             "option_number": 1,
-            "name": "Light & Airy {style}",
-            "concept": "Description of this design variation",
-            "color_palette": {{"primary": "#hex", "secondary": "#hex", "accent": "#hex"}},
-            "key_furniture": ["main pieces needed"],
-            "key_features": ["design features"],
+            "name": "{style} - Light & Airy",
+            "variation": "Light & Airy",
+            "concept": "Brief description of this bright, spacious design",
+            "color_palette": {{"primary": "#F5F5F5", "secondary": "#E0E0E0", "accent": "#4A90A4"}},
+            "key_furniture": ["white sofa", "glass coffee table", "floor lamp"],
             "estimated_cost": 15000,
-            "mood": "bright, spacious, welcoming"
+            "mood": "bright, spacious, calming"
         }},
         {{
             "option_number": 2,
-            "name": "Warm & Cozy {style}",
-            "concept": "Description",
-            "color_palette": {{"primary": "#hex", "secondary": "#hex", "accent": "#hex"}},
-            "key_furniture": ["pieces"],
-            "key_features": ["features"],
+            "name": "{style} - Warm & Cozy",
+            "variation": "Warm & Cozy",
+            "concept": "Description of warm, inviting design",
+            "color_palette": {{"primary": "#F5E6D3", "secondary": "#D4A574", "accent": "#8B4513"}},
+            "key_furniture": ["leather sofa", "wood coffee table", "table lamps"],
             "estimated_cost": 18000,
             "mood": "warm, inviting, comfortable"
         }},
         {{
             "option_number": 3,
-            "name": "Bold & Dramatic {style}",
-            "concept": "Description",
-            "color_palette": {{"primary": "#hex", "secondary": "#hex", "accent": "#hex"}},
-            "key_furniture": ["pieces"],
-            "key_features": ["features"],
-            "estimated_cost": 22000,
-            "mood": "striking, sophisticated, memorable"
+            "name": "{style} - Bold & Dramatic",
+            "variation": "Bold & Dramatic", 
+            "concept": "Description of striking design",
+            "color_palette": {{"primary": "#2C3E50", "secondary": "#34495E", "accent": "#E74C3C"}},
+            "key_furniture": ["velvet sofa", "marble coffee table", "statement chandelier"],
+            "estimated_cost": 25000,
+            "mood": "dramatic, sophisticated, memorable"
         }}
     ]
 }}""",
@@ -618,343 +533,334 @@ Return JSON:
         )
 
         text = response.content[0].text
-        json_match = re.search(r"\{[\s\S]*\}", text)
-        if json_match:
-            designs = json.loads(json_match.group())
-        else:
-            return {"error": "Could not parse design concepts"}
-
-        return designs
-
+        match = re.search(r"\{[\s\S]*\}", text)
+        return json.loads(match.group()) if match else {"error": "Parse failed"}
     except Exception as e:
         return {"error": str(e)}
 
 
-def run_procurement_agent(
-    selected_design: dict, furniture_items: list, product_matches: dict
-) -> dict:
-    """Generate BOM based on selected design and matched products"""
-    client = get_claude_client()
-    if not client:
-        return {"error": "API key not configured"}
+def generate_bom(selected_design: dict, furniture: list, products: dict) -> dict:
+    """Generate final BOM with selected products"""
+    product_lines = []
+    total = 0
 
-    # Build product list from matches
-    products_text = ""
-    for item in furniture_items:
-        item_id = item.get("id", 0)
-        matches = product_matches.get(str(item_id), [])
+    for item in furniture:
+        item_id = str(item.get("id", 0))
+        matches = products.get(item_id, [])
         if matches:
-            best_match = matches[0]
-            products_text += f"- {item.get('name')}: {best_match.get('product_name')} from {best_match.get('retailer')} - ${best_match.get('price', 0)}\n"
-
-    try:
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=4096,
-            messages=[
+            best = matches[0]
+            price = best.get("price", 0)
+            if isinstance(price, str):
+                price = 0
+            product_lines.append(
                 {
-                    "role": "user",
-                    "content": f"""Create a Bill of Materials for this renovation:
-
-Design: {selected_design.get('name', 'Renovation')}
-Budget: ${selected_design.get('estimated_cost', 20000)}
-
-Selected Products:
-{products_text}
-
-Return JSON:
-{{
-    "bill_of_materials": {{
-        "categories": [
-            {{
-                "category_name": "Furniture",
-                "items": [
-                    {{"item_name": "Product name", "retailer": "Store", "quantity": 1, "unit_price": 0, "total_price": 0, "url": "link"}}
-                ],
-                "category_total": 0
-            }}
-        ]
-    }},
-    "labor_estimates": [{{"trade": "Trade", "hours": 0, "rate": 50, "total": 0}}],
-    "total_summary": {{
-        "products_total": 0,
-        "labor_total": 0,
-        "contingency": 0,
-        "grand_total": 0
-    }}
-}}""",
+                    "item": item.get("name"),
+                    "product": best.get("product_name"),
+                    "retailer": best.get("retailer"),
+                    "price": price,
+                    "url": best.get("url"),
                 }
-            ],
-        )
+            )
+            total += price
 
-        text = response.content[0].text
-        json_match = re.search(r"\{[\s\S]*\}", text)
-        if json_match:
-            return json.loads(json_match.group())
-        return {"raw_response": text}
+    # If no prices from SerpAPI, estimate from furniture
+    if total == 0:
+        for item in furniture:
+            avg_price = (
+                item.get("price_estimate_low", 500)
+                + item.get("price_estimate_high", 1500)
+            ) / 2
+            total += avg_price
 
-    except Exception as e:
-        return {"error": str(e)}
+    return {
+        "bill_of_materials": {
+            "design": selected_design.get("name", "Design"),
+            "items": product_lines,
+            "products_total": total,
+        },
+        "labor_estimates": [
+            {"trade": "Painter", "hours": 16, "rate": 50, "total": 800},
+            {"trade": "Electrician", "hours": 8, "rate": 75, "total": 600},
+            {"trade": "General Labor", "hours": 12, "rate": 40, "total": 480},
+        ],
+        "total_summary": {
+            "products_total": total,
+            "labor_total": 1880,
+            "contingency": (total + 1880) * 0.1,
+            "grand_total": (total + 1880) * 1.1,
+        },
+    }
 
 
-# ============== UI COMPONENTS ==============
+# ============== UI ==============
 
 
 def render_header():
     st.title("🏠 OmniRenovation AI")
-    st.caption("AI-Native Renovation Platform with Visual Design Generation")
+    st.caption("AI Interior Design with Real Product Matching")
 
     phases = [
         "📤 Upload",
-        "📊 Valuation",
+        "📊 Analysis",
         "🎨 Design",
         "🛋️ Products",
         "📦 BOM",
         "✅ Done",
     ]
-    phase_map = {
+    current = {
         "upload": 0,
         "valuation": 1,
         "design": 2,
         "products": 3,
         "bom": 4,
         "complete": 5,
-    }
-    current = phase_map.get(st.session_state.project_state["phase"], 0)
+    }.get(st.session_state.project_state["phase"], 0)
 
     cols = st.columns(6)
-    for i, phase in enumerate(phases):
+    for i, p in enumerate(phases):
         with cols[i]:
             if i < current:
-                st.success(phase)
+                st.success(p)
             elif i == current:
-                st.info(phase)
+                st.info(p)
             else:
-                st.text(phase)
+                st.text(p)
 
 
 def render_upload_phase():
-    st.header("📤 Upload Property Images or 3D Scan")
+    st.header("📤 Upload Your Room")
 
     # API Keys
-    with st.expander("🔑 API Configuration", expanded=True):
+    with st.expander("🔑 API Keys", expanded=True):
         col1, col2 = st.columns(2)
 
         with col1:
-            anthropic_key = st.text_input(
-                "Anthropic API Key (Required)",
+            key = st.text_input(
+                "Anthropic API Key *",
                 type="password",
                 value=st.session_state.get("anthropic_key", ""),
-                help="For analysis and product matching",
+                help="Required - for analysis and segmentation",
             )
-            if anthropic_key:
-                st.session_state.anthropic_key = anthropic_key
+            if key:
+                st.session_state.anthropic_key = key
 
-        with col2:
-            openai_key = st.text_input(
-                "OpenAI API Key (Required for design images)",
+            key2 = st.text_input(
+                "OpenAI API Key",
                 type="password",
                 value=st.session_state.get("openai_key", ""),
-                help="For DALL-E 3 image generation",
+                help="Optional - for DALL-E design images",
             )
-            if openai_key:
-                st.session_state.openai_key = openai_key
+            if key2:
+                st.session_state.openai_key = key2
 
-        if anthropic_key and openai_key:
-            st.success("✅ Both API keys configured!")
-        elif anthropic_key:
-            st.warning("⚠️ Add OpenAI key for AI-generated design images")
+        with col2:
+            key3 = st.text_input(
+                "SerpAPI Key",
+                type="password",
+                value=st.session_state.get("serpapi_key", ""),
+                help="Optional - for real product links (100 free/month)",
+            )
+            if key3:
+                st.session_state.serpapi_key = key3
+
+            st.caption("💡 Without SerpAPI, you'll get search links to retailers")
+
+        # Status
+        status = []
+        if st.session_state.get("anthropic_key"):
+            status.append("✅ Claude")
+        else:
+            status.append("❌ Claude")
+        if st.session_state.get("openai_key"):
+            status.append("✅ DALL-E")
+        if st.session_state.get("serpapi_key"):
+            status.append("✅ Products")
+        st.write(" | ".join(status))
 
     st.divider()
 
     # Upload
-    tab1, tab2 = st.tabs(["📷 Photos", "🎯 3D Scan"])
+    tab1, tab2 = st.tabs(["📷 Photo", "🎯 3D Scan"])
 
     uploaded_images = []
-    uploaded_3d = None
 
     with tab1:
         uploaded_images = st.file_uploader(
-            "Upload room photos",
+            "Upload room photo(s)",
             type=["jpg", "jpeg", "png", "webp"],
             accept_multiple_files=True,
-            key="img_upload",
         )
 
         if uploaded_images:
-            cols = st.columns(4)
+            cols = st.columns(min(4, len(uploaded_images)))
             for i, f in enumerate(uploaded_images):
                 with cols[i % 4]:
                     f.seek(0)
                     st.image(Image.open(f), caption=f.name, use_column_width=True)
 
     with tab2:
-        uploaded_3d = st.file_uploader(
-            "Upload GLB file", type=["glb", "gltf"], key="3d_upload"
-        )
+        uploaded_3d = st.file_uploader("Upload GLB/GLTF", type=["glb", "gltf"])
 
         if uploaded_3d:
             uploaded_3d.seek(0)
-            file_bytes = uploaded_3d.read()
-            glb_base64 = base64.b64encode(file_bytes).decode("utf-8")
-            metadata, _ = extract_glb_metadata(file_bytes)
+            data = uploaded_3d.read()
+            glb_b64 = base64.b64encode(data).decode()
+            meta, _ = extract_glb_metadata(data)
 
-            st.success(f"✅ {uploaded_3d.name} ({len(file_bytes)/1024/1024:.1f} MB)")
-
-            if metadata:
+            if meta:
                 cols = st.columns(3)
-                cols[0].metric("Meshes", metadata.get("meshes", 0))
-                cols[1].metric("Materials", metadata.get("materials", 0))
-                cols[2].metric("Textures", metadata.get("textures", 0))
+                cols[0].metric("Meshes", meta["meshes"])
+                cols[1].metric("Materials", meta["materials"])
+                cols[2].metric("Size", f"{meta['file_size_mb']:.1f}MB")
 
-            st.subheader("🎮 3D Preview")
-            components.html(create_3d_viewer_html(glb_base64, 400), height=430)
+            components.html(create_3d_viewer_html(glb_b64, 350), height=380)
 
-            st.session_state.project_state["glb_base64"] = glb_base64
-            st.session_state.project_state["scan_metadata"] = metadata
+            st.session_state.project_state["glb_base64"] = glb_b64
+            st.session_state.project_state["scan_metadata"] = meta
+            st.session_state.project_state["has_3d_scan"] = True
 
     st.divider()
 
     # Preferences
-    st.subheader("Preferences")
     col1, col2 = st.columns(2)
-
     with col1:
         budget = st.select_slider(
             "Budget",
-            ["< $5K", "$5K-$15K", "$15K-$30K", "$30K-$50K", "$50K-$100K", "> $100K"],
-            value="$15K-$30K",
+            ["<$5K", "$5-15K", "$15-30K", "$30-50K", "$50-100K", ">$100K"],
+            "$15-30K",
         )
         style = st.selectbox(
-            "Design Style",
+            "Style",
             [
                 "Modern Minimalist",
-                "Contemporary",
                 "Scandinavian",
                 "Industrial",
                 "Mid-Century Modern",
-                "Traditional",
+                "Contemporary",
                 "Bohemian",
                 "Coastal",
                 "Farmhouse",
             ],
         )
-
     with col2:
         goals = st.multiselect(
             "Goals",
-            [
-                "Increase value",
-                "Improve function",
-                "Update style",
-                "Fix issues",
-                "Energy efficiency",
-            ],
-            default=["Update style"],
+            ["Update style", "Increase value", "Improve function", "More storage"],
+            ["Update style"],
         )
-        priorities = st.multiselect(
-            "Priority Areas",
-            ["Kitchen", "Bathroom", "Living Room", "Bedroom", "Flooring", "Lighting"],
-            default=["Living Room"],
+        room_type = st.selectbox(
+            "Room Type",
+            [
+                "Living Room",
+                "Bedroom",
+                "Kitchen",
+                "Bathroom",
+                "Home Office",
+                "Dining Room",
+            ],
         )
 
     st.divider()
 
-    has_keys = bool(st.session_state.get("anthropic_key"))
-    has_content = bool(uploaded_images or uploaded_3d)
+    can_proceed = bool(st.session_state.get("anthropic_key")) and bool(uploaded_images)
 
-    if st.button(
-        "🚀 Start Analysis", type="primary", disabled=not has_keys or not has_content
-    ):
-        images = []
-        for f in uploaded_images or []:
-            result = process_uploaded_image(f)
-            if result["success"]:
-                images.append(result)
-
-        if uploaded_3d:
-            st.session_state.project_state["has_3d_scan"] = True
+    if st.button("🚀 Analyze Room", type="primary", disabled=not can_proceed):
+        images = [process_uploaded_image(f) for f in uploaded_images]
+        images = [i for i in images if i["success"]]
 
         st.session_state.project_state["images"] = images
         st.session_state.project_state["preferences"] = {
             "budget": budget,
             "style": style,
             "goals": ", ".join(goals),
-            "priorities": ", ".join(priorities),
+            "room_type": room_type,
         }
         st.session_state.project_state["phase"] = "valuation"
         st.rerun()
 
+    if not st.session_state.get("anthropic_key"):
+        st.warning("⚠️ Add Anthropic API key to continue")
+
 
 def render_valuation_phase():
-    st.header("📊 Property Valuation")
+    st.header("📊 Room Analysis")
 
     if not st.session_state.project_state["valuation"]:
-        with st.spinner("🔍 Analyzing property..."):
-            valuation = run_valuation_agent(
+        with st.spinner("🔍 Analyzing your room..."):
+            val = run_valuation_agent(
                 st.session_state.project_state["images"],
                 st.session_state.project_state["preferences"],
                 st.session_state.project_state.get("scan_metadata"),
             )
-            st.session_state.project_state["valuation"] = valuation
+            st.session_state.project_state["valuation"] = val
             st.rerun()
 
-    valuation = st.session_state.project_state["valuation"]
+    val = st.session_state.project_state["valuation"]
 
-    if "error" in valuation:
-        st.error(valuation["error"])
+    if "error" in val:
+        st.error(val["error"])
         if st.button("🔄 Retry"):
             st.session_state.project_state["valuation"] = None
             st.rerun()
         return
 
     # Display
-    cost = valuation.get("cost_estimate", {})
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Low", f"${cost.get('low_estimate', 0):,.0f}")
-    col2.metric("Mid", f"${cost.get('mid_estimate', 0):,.0f}")
-    col3.metric("High", f"${cost.get('high_estimate', 0):,.0f}")
+    assessment = val.get("property_assessment", {})
+    cost = val.get("cost_estimate", {})
 
-    assessment = valuation.get("property_assessment", {})
-    with st.expander("🏠 Assessment", expanded=True):
-        st.write(f"**Room Type:** {assessment.get('room_type', 'N/A')}")
-        st.write(f"**Condition:** {assessment.get('current_condition', 'N/A')}")
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Room Type", assessment.get("room_type", "N/A"))
+    col2.metric("Condition", assessment.get("current_condition", "N/A"))
+    col3.metric("Est. Cost", f"${cost.get('mid', 0):,}")
+
+    with st.expander("Details", expanded=True):
         st.write(f"**Size:** {assessment.get('square_footage_estimate', 'N/A')}")
+        st.write(f"**Current Style:** {assessment.get('current_style', 'N/A')}")
+        st.write(f"**Natural Light:** {assessment.get('natural_light', 'N/A')}")
+        features = assessment.get("notable_features", [])
+        if features:
+            st.write(f"**Features:** {', '.join(features)}")
+
+    # Recommended work
+    scope = val.get("renovation_scope", {})
+    work = scope.get("recommended_work", [])
+    if work:
+        with st.expander("Recommended Work"):
+            for w in work:
+                priority_icon = {"high": "🔴", "medium": "🟡", "low": "🟢"}.get(
+                    w.get("priority", ""), "⚪"
+                )
+                st.write(
+                    f"{priority_icon} **{w.get('area', 'N/A')}:** {w.get('work', 'N/A')}"
+                )
 
     st.divider()
 
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("👍 Continue to Design", type="primary"):
+        if st.button("🎨 Generate Designs", type="primary"):
             st.session_state.project_state["phase"] = "design"
             st.rerun()
     with col2:
-        if st.button("🔄 Start Over"):
-            for key in list(st.session_state.project_state.keys()):
-                if key != "phase":
-                    st.session_state.project_state[key] = (
-                        [] if "images" in key else None
-                    )
-            st.session_state.project_state["phase"] = "upload"
+        if st.button("← Start Over"):
+            st.session_state.project_state = DEFAULT_STATE.copy()
             st.rerun()
 
 
 def render_design_phase():
-    st.header("🎨 AI-Generated Design Options")
+    st.header("🎨 AI-Generated Designs")
 
-    # Generate design concepts first
+    # Generate concepts
     if not st.session_state.project_state["designs"]:
-        with st.spinner("🎨 Creating design concepts..."):
-            designs = run_design_agent_with_images(
-                st.session_state.project_state["images"],
-                st.session_state.project_state["preferences"],
+        with st.spinner("Creating design concepts..."):
+            designs = generate_design_concepts(
                 st.session_state.project_state["valuation"],
+                st.session_state.project_state["preferences"],
             )
             st.session_state.project_state["designs"] = designs
             st.rerun()
 
     designs = st.session_state.project_state["designs"]
-
     if "error" in designs:
         st.error(designs["error"])
         if st.button("🔄 Retry"):
@@ -962,90 +868,122 @@ def render_design_phase():
             st.rerun()
         return
 
-    # Generate images if not already done
-    if not st.session_state.project_state.get("design_images"):
-        if st.session_state.get("openai_key"):
-            with st.spinner(
-                "🖼️ Generating design images with DALL-E 3... (this may take 30-60 seconds)"
-            ):
-                design_images = generate_design_images(
-                    st.session_state.project_state["valuation"],
-                    st.session_state.project_state["preferences"],
-                )
-                st.session_state.project_state["design_images"] = design_images
-                st.rerun()
-        else:
-            st.warning("⚠️ Add OpenAI API key to generate design images")
-
+    has_openai = bool(st.session_state.get("openai_key")) and OPENAI_AVAILABLE
     design_images = st.session_state.project_state.get("design_images", {})
-    design_options = designs.get("design_options", [])
 
-    # Display designs
-    for i, opt in enumerate(design_options):
-        opt_num = opt.get("option_number", i + 1)
+    # Show original
+    if st.session_state.project_state["images"]:
+        with st.expander("📷 Your Original Room", expanded=False):
+            img_data = st.session_state.project_state["images"][0]
+            st.image(base64.b64decode(img_data["data"]), use_column_width=True)
 
-        with st.container():
-            st.subheader(f"Option {opt_num}: {opt.get('name', 'Design')}")
+    # Display options
+    options = designs.get("design_options", [])
 
-            col1, col2 = st.columns([2, 1])
+    for opt in options:
+        opt_num = opt["option_number"]
 
-            with col1:
-                # Show generated image if available
-                img_data = design_images.get(opt_num, {})
-                if img_data.get("image_base64"):
-                    img_bytes = base64.b64decode(img_data["image_base64"])
-                    st.image(
-                        img_bytes,
-                        caption=f"AI-Generated: {opt.get('name')}",
-                        use_column_width=True,
+        st.subheader(f"Option {opt_num}: {opt.get('name', 'Design')}")
+
+        col1, col2 = st.columns([2, 1])
+
+        with col1:
+            # Show image or generate button
+            if opt_num in design_images and design_images[opt_num].get("success"):
+                st.image(
+                    base64.b64decode(design_images[opt_num]["image_base64"]),
+                    caption=f"AI-Generated: {opt.get('name')}",
+                    use_column_width=True,
+                )
+            elif opt_num in design_images and design_images[opt_num].get("error"):
+                st.error(f"Generation failed: {design_images[opt_num]['error']}")
+                if st.button(f"🔄 Retry Option {opt_num}", key=f"retry_{opt_num}"):
+                    del design_images[opt_num]
+                    st.session_state.project_state["design_images"] = design_images
+                    st.rerun()
+            else:
+                # Show color palette as preview
+                palette = opt.get("color_palette", {})
+                pcols = st.columns(3)
+                for i, (k, v) in enumerate(list(palette.items())[:3]):
+                    pcols[i].color_picker(
+                        k.title(), v, disabled=True, key=f"c_{opt_num}_{i}"
                     )
-                elif img_data.get("error"):
-                    st.error(f"Image generation failed: {img_data['error']}")
+
+                if has_openai:
+                    if st.button(f"🖼️ Generate Image", key=f"gen_{opt_num}"):
+                        room_type = (
+                            st.session_state.project_state["valuation"]
+                            .get("property_assessment", {})
+                            .get("room_type", "living room")
+                        )
+                        with st.spinner(
+                            f"Generating {opt.get('variation', 'design')} image... (~30 sec)"
+                        ):
+                            result = generate_design_dalle(
+                                room_type,
+                                st.session_state.project_state["preferences"]["style"],
+                                opt.get("variation", "Light & Airy"),
+                            )
+                            design_images[opt_num] = result
+                            st.session_state.project_state["design_images"] = (
+                                design_images
+                            )
+                            st.rerun()
                 else:
-                    st.info("🖼️ Image not generated (add OpenAI key)")
-                    # Show color palette as fallback
-                    palette = opt.get("color_palette", {})
-                    pcols = st.columns(3)
-                    pcols[0].color_picker(
-                        "Primary", palette.get("primary", "#000"), disabled=True
-                    )
-                    pcols[1].color_picker(
-                        "Secondary", palette.get("secondary", "#666"), disabled=True
-                    )
-                    pcols[2].color_picker(
-                        "Accent", palette.get("accent", "#999"), disabled=True
-                    )
+                    st.info("💡 Add OpenAI API key to generate design images")
 
-            with col2:
-                st.write(f"**Concept:** {opt.get('concept', 'N/A')}")
-                st.write(f"**Mood:** {opt.get('mood', 'N/A')}")
-                st.metric("Estimated Cost", f"${opt.get('estimated_cost', 0):,.0f}")
+        with col2:
+            st.write(f"**Mood:** {opt.get('mood', 'N/A')}")
+            st.write(f"**Concept:** {opt.get('concept', 'N/A')}")
+            st.metric("Est. Cost", f"${opt.get('estimated_cost', 0):,}")
 
-                st.write("**Key Furniture:**")
-                for item in opt.get("key_furniture", [])[:5]:
-                    st.write(f"• {item}")
+            st.write("**Key Furniture:**")
+            for item in opt.get("key_furniture", [])[:5]:
+                st.write(f"• {item}")
 
             if st.button(
-                f"✓ Select Option {opt_num}", key=f"sel_{opt_num}", type="primary"
+                f"✅ Select Option {opt_num}", key=f"sel_{opt_num}", type="primary"
             ):
                 st.session_state.project_state["selected_design"] = opt
-                st.session_state.project_state["selected_design_image"] = img_data.get(
-                    "image_base64"
-                )
-                st.success(f"✅ Option {opt_num} selected!")
+                if opt_num in design_images and design_images[opt_num].get("success"):
+                    st.session_state.project_state["selected_design_image"] = (
+                        design_images[opt_num]["image_base64"]
+                    )
+                st.success("Selected!")
 
-            st.divider()
+        st.divider()
 
-    # Continue button
+    # Generate all button
+    if has_openai and len(design_images) < len(options):
+        if st.button("🎨 Generate All Design Images"):
+            room_type = (
+                st.session_state.project_state["valuation"]
+                .get("property_assessment", {})
+                .get("room_type", "living room")
+            )
+            for opt in options:
+                if opt["option_number"] not in design_images:
+                    with st.spinner(f"Generating {opt.get('name')}..."):
+                        result = generate_design_dalle(
+                            room_type,
+                            st.session_state.project_state["preferences"]["style"],
+                            opt.get("variation", "Light & Airy"),
+                        )
+                        design_images[opt["option_number"]] = result
+            st.session_state.project_state["design_images"] = design_images
+            st.rerun()
+
+    # Continue
     if st.session_state.project_state.get("selected_design"):
         st.success(
             f"✓ Selected: {st.session_state.project_state['selected_design'].get('name')}"
         )
-        if st.button("🛋️ Find Matching Products", type="primary"):
+        if st.button("🛋️ Find Real Products", type="primary"):
             st.session_state.project_state["phase"] = "products"
             st.rerun()
 
-    if st.button("← Back to Valuation"):
+    if st.button("← Back"):
         st.session_state.project_state["phase"] = "valuation"
         st.rerun()
 
@@ -1053,111 +991,119 @@ def render_design_phase():
 def render_products_phase():
     st.header("🛋️ Real Product Matching")
 
-    selected_image = st.session_state.project_state.get("selected_design_image")
+    # Get image for segmentation
+    design_img = st.session_state.project_state.get("selected_design_image")
+    if not design_img and st.session_state.project_state["images"]:
+        design_img = st.session_state.project_state["images"][0]["data"]
 
-    if not selected_image:
-        st.warning("No design image available for product matching")
-        if st.button("← Back to Design"):
+    if not design_img:
+        st.warning("No image for product matching")
+        if st.button("← Back"):
             st.session_state.project_state["phase"] = "design"
             st.rerun()
         return
 
-    # Segment furniture if not done
+    # Segment furniture
     if not st.session_state.project_state.get("furniture_items"):
-        with st.spinner("🔍 Identifying furniture in design..."):
-            furniture = segment_furniture_from_design(
-                selected_image,
-                st.session_state.project_state["selected_design"].get("name", "Design"),
-            )
+        with st.spinner("🔍 Identifying furniture..."):
+            furniture = segment_furniture(design_img)
             st.session_state.project_state["furniture_items"] = furniture
             st.rerun()
 
-    furniture_items = st.session_state.project_state.get("furniture_items", [])
+    furniture = st.session_state.project_state["furniture_items"]
 
-    if not furniture_items:
-        st.warning("Could not identify furniture items")
-        if st.button("🔄 Retry"):
-            st.session_state.project_state["furniture_items"] = []
-            st.rerun()
-        return
+    if not furniture:
+        st.warning("Could not identify items. Using design suggestions instead.")
+        # Use key_furniture from selected design
+        design = st.session_state.project_state.get("selected_design", {})
+        furniture = [
+            {"id": i + 1, "name": item, "search_keywords": [item]}
+            for i, item in enumerate(
+                design.get("key_furniture", ["sofa", "table", "lamp"])
+            )
+        ]
+        st.session_state.project_state["furniture_items"] = furniture
 
-    # Show design image with identified items
+    # Display
     col1, col2 = st.columns([1, 1])
 
     with col1:
-        st.subheader("Selected Design")
-        img_bytes = base64.b64decode(selected_image)
-        st.image(img_bytes, use_column_width=True)
+        st.subheader("Design")
+        st.image(base64.b64decode(design_img), use_column_width=True)
 
     with col2:
-        st.subheader(f"Identified Items ({len(furniture_items)})")
-        for item in furniture_items:
-            with st.expander(
-                f"🪑 {item.get('name', 'Item')} - {item.get('position', '')}",
-                expanded=False,
-            ):
-                st.write(f"**Type:** {item.get('item_type', 'N/A')}")
-                st.write(f"**Style:** {item.get('style', 'N/A')}")
-                st.write(f"**Color:** {item.get('color', 'N/A')}")
-                st.write(f"**Material:** {item.get('material', 'N/A')}")
-                st.write(
-                    f"**Est. Price:** ${item.get('estimated_price_low', 0):,} - ${item.get('estimated_price_high', 0):,}"
-                )
+        st.subheader(f"Found {len(furniture)} Items")
+        for item in furniture:
+            st.write(f"**{item.get('id')}. {item.get('name', 'Item')}**")
+            if item.get("color") or item.get("material"):
+                st.caption(f"{item.get('color', '')} {item.get('material', '')}")
 
     st.divider()
-    st.subheader("🔗 Real Product Matches")
+    st.subheader("🛒 Product Matches")
 
-    # Find products for each item
+    has_serpapi = bool(get_serpapi_key())
+    if has_serpapi:
+        st.success("✅ Using SerpAPI - Real product links!")
+    else:
+        st.info(
+            "💡 Add SerpAPI key for direct product links. Currently showing search links."
+        )
+
     product_matches = st.session_state.project_state.get("product_matches", {})
 
-    for item in furniture_items:
+    for item in furniture:
         item_id = str(item.get("id", 0))
 
-        with st.expander(f"🛒 {item.get('name', 'Item')}", expanded=True):
-            # Find matches if not already done
+        with st.expander(f"🔍 {item.get('name', 'Item')}", expanded=True):
             if item_id not in product_matches:
-                with st.spinner(f"Finding products for {item.get('name')}..."):
-                    matches = find_real_products(item)
+                with st.spinner(f"Searching..."):
+                    matches = find_products_for_item(item)
                     product_matches[item_id] = matches
                     st.session_state.project_state["product_matches"] = product_matches
 
             matches = product_matches.get(item_id, [])
 
             if matches:
-                cols = st.columns(len(matches))
-                for j, match in enumerate(matches):
-                    with cols[j]:
-                        st.write(f"**{match.get('product_name', 'Product')}**")
+                cols = st.columns(min(3, len(matches)))
+
+                for i, match in enumerate(matches[:3]):
+                    with cols[i]:
+                        # Image
+                        if match.get("image_url"):
+                            try:
+                                st.image(match["image_url"], width=120)
+                            except:
+                                pass
+
+                        st.write(f"**{match.get('product_name', 'Product')[:40]}**")
                         st.write(f"🏪 {match.get('retailer', 'N/A')}")
-                        st.write(f"💰 ${match.get('price', 0):,}")
-                        st.write(f"📏 {match.get('dimensions', 'N/A')}")
-                        st.write(f"🎯 {match.get('match_score', 0)}% match")
+                        st.write(f"💰 {match.get('price_str', 'N/A')}")
 
-                        url = match.get("url", "#")
-                        st.markdown(f"[🔗 View Product]({url})")
+                        if match.get("rating"):
+                            st.write(f"⭐ {match['rating']}")
 
-                        if st.button(f"✓ Select", key=f"prod_{item_id}_{j}"):
-                            if (
-                                "selected_products"
-                                not in st.session_state.project_state
-                            ):
-                                st.session_state.project_state["selected_products"] = {}
+                        # REAL CLICKABLE LINK
+                        url = match.get("url", "")
+                        if url:
+                            st.link_button("🔗 View product", url)
+
+                        if st.button(
+                            "✓", key=f"p_{item_id}_{i}", help="Select this product"
+                        ):
                             st.session_state.project_state["selected_products"][
                                 item_id
                             ] = match
-                            st.success("Selected!")
-            else:
-                st.info("No matches found - searching...")
+                            st.success("✓")
 
     st.divider()
 
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("📦 Generate Final BOM", type="primary"):
+        if st.button("📦 Generate BOM", type="primary"):
             st.session_state.project_state["phase"] = "bom"
             st.rerun()
     with col2:
-        if st.button("← Back to Design"):
+        if st.button("← Back"):
             st.session_state.project_state["phase"] = "design"
             st.rerun()
 
@@ -1166,56 +1112,47 @@ def render_bom_phase():
     st.header("📦 Bill of Materials")
 
     if not st.session_state.project_state.get("bom"):
-        with st.spinner("📦 Generating BOM..."):
-            bom = run_procurement_agent(
-                st.session_state.project_state.get("selected_design", {}),
-                st.session_state.project_state.get("furniture_items", []),
-                st.session_state.project_state.get("product_matches", {}),
-            )
-            st.session_state.project_state["bom"] = bom
-            st.rerun()
+        bom = generate_bom(
+            st.session_state.project_state.get("selected_design", {}),
+            st.session_state.project_state.get("furniture_items", []),
+            st.session_state.project_state.get("product_matches", {}),
+        )
+        st.session_state.project_state["bom"] = bom
 
     bom = st.session_state.project_state["bom"]
-
-    if "error" in bom:
-        st.error(bom["error"])
-        if st.button("🔄 Retry"):
-            st.session_state.project_state["bom"] = None
-            st.rerun()
-        return
-
-    # Summary
     summary = bom.get("total_summary", {})
+
     col1, col2, col3 = st.columns(3)
     col1.metric("Products", f"${summary.get('products_total', 0):,.0f}")
     col2.metric("Labor", f"${summary.get('labor_total', 0):,.0f}")
-    col3.metric("Total", f"${summary.get('grand_total', 0):,.0f}")
+    col3.metric("**Total**", f"${summary.get('grand_total', 0):,.0f}")
 
     st.divider()
 
-    # Categories
-    for cat in bom.get("bill_of_materials", {}).get("categories", []):
-        with st.expander(
-            f"📁 {cat.get('category_name')} - ${cat.get('category_total', 0):,.0f}"
-        ):
-            for item in cat.get("items", []):
-                col1, col2, col3 = st.columns([3, 1, 1])
-                col1.write(
-                    f"**{item.get('item_name')}** ({item.get('retailer', 'N/A')})"
-                )
-                col2.write(f"${item.get('unit_price', 0):,.0f}")
-                if item.get("url"):
-                    col3.markdown(f"[🔗 Link]({item.get('url')})")
+    st.subheader("🛍️ Products")
+    for item in bom.get("bill_of_materials", {}).get("items", []):
+        col1, col2, col3 = st.columns([3, 1, 1])
+        col1.write(f"**{item.get('item')}**")
+        col1.caption(f"{item.get('product', '')} ({item.get('retailer', '')})")
+        col2.write(f"${item.get('price', 0):,.0f}" if item.get("price") else "See link")
+        if item.get("url"):
+            col3.link_button("🔗 Link", item["url"])
+
+    st.subheader("👷 Labor")
+    for labor in bom.get("labor_estimates", []):
+        st.write(
+            f"• {labor['trade']}: {labor['hours']}hrs @ ${labor['rate']}/hr = **${labor['total']}**"
+        )
 
     st.divider()
 
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("✅ Complete", type="primary"):
+        if st.button("✅ Complete Project", type="primary"):
             st.session_state.project_state["phase"] = "complete"
             st.rerun()
     with col2:
-        if st.button("← Back to Products"):
+        if st.button("← Back"):
             st.session_state.project_state["phase"] = "products"
             st.rerun()
 
@@ -1224,7 +1161,6 @@ def render_complete_phase():
     st.header("✅ Project Complete!")
     st.balloons()
 
-    # Summary
     design = st.session_state.project_state.get("selected_design", {})
     bom = st.session_state.project_state.get("bom", {})
 
@@ -1233,55 +1169,52 @@ def render_complete_phase():
     with col1:
         st.subheader("Selected Design")
         if st.session_state.project_state.get("selected_design_image"):
-            img_bytes = base64.b64decode(
-                st.session_state.project_state["selected_design_image"]
+            st.image(
+                base64.b64decode(
+                    st.session_state.project_state["selected_design_image"]
+                ),
+                use_column_width=True,
             )
-            st.image(img_bytes, use_column_width=True)
-        st.write(f"**{design.get('name', 'Design')}**")
+        st.write(f"**{design.get('name', 'N/A')}**")
+        st.write(design.get("concept", ""))
 
     with col2:
         st.subheader("Budget Summary")
         summary = bom.get("total_summary", {})
         st.metric("Total Project Cost", f"${summary.get('grand_total', 0):,.0f}")
-        st.write(f"Products: ${summary.get('products_total', 0):,.0f}")
-        st.write(f"Labor: ${summary.get('labor_total', 0):,.0f}")
+        st.write(f"• Products: ${summary.get('products_total', 0):,.0f}")
+        st.write(f"• Labor: ${summary.get('labor_total', 0):,.0f}")
+        st.write(f"• Contingency (10%): ${summary.get('contingency', 0):,.0f}")
+
+    st.divider()
+
+    # Product links summary
+    st.subheader("🔗 Quick Links")
+    for item in bom.get("bill_of_materials", {}).get("items", []):
+        if item.get("url"):
+            st.write(f"• {item.get('item')} - {item.get('retailer')}")
+            st.link_button("Open", item["url"])
 
     st.divider()
 
     # Export
-    export_data = {
+    export = {
         "timestamp": datetime.now().isoformat(),
         "design": design,
-        "furniture_items": st.session_state.project_state.get("furniture_items", []),
-        "product_matches": st.session_state.project_state.get("product_matches", {}),
+        "furniture": st.session_state.project_state.get("furniture_items", []),
+        "products": st.session_state.project_state.get("product_matches", {}),
         "bom": bom,
     }
 
     st.download_button(
-        "📥 Download Project",
-        json.dumps(export_data, indent=2),
+        "📥 Download Project JSON",
+        json.dumps(export, indent=2),
         f"renovation_{datetime.now().strftime('%Y%m%d')}.json",
         "application/json",
     )
 
-    if st.button("🔄 New Project"):
-        st.session_state.project_state = {
-            "phase": "upload",
-            "images": [],
-            "preferences": {},
-            "valuation": None,
-            "designs": None,
-            "design_images": {},
-            "selected_design": None,
-            "furniture_items": [],
-            "product_matches": {},
-            "bom": None,
-            "gate_1_approved": False,
-            "gate_2_approved": False,
-            "has_3d_scan": False,
-            "scan_metadata": None,
-            "glb_base64": None,
-        }
+    if st.button("🔄 Start New Project"):
+        st.session_state.project_state = DEFAULT_STATE.copy()
         st.rerun()
 
 
@@ -1291,18 +1224,14 @@ def main():
 
     phase = st.session_state.project_state["phase"]
 
-    if phase == "upload":
-        render_upload_phase()
-    elif phase == "valuation":
-        render_valuation_phase()
-    elif phase == "design":
-        render_design_phase()
-    elif phase == "products":
-        render_products_phase()
-    elif phase == "bom":
-        render_bom_phase()
-    elif phase == "complete":
-        render_complete_phase()
+    {
+        "upload": render_upload_phase,
+        "valuation": render_valuation_phase,
+        "design": render_design_phase,
+        "products": render_products_phase,
+        "bom": render_bom_phase,
+        "complete": render_complete_phase,
+    }.get(phase, render_upload_phase)()
 
 
 if __name__ == "__main__":
