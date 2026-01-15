@@ -1,0 +1,170 @@
+# SearXNG settings.yml
+# Optimized for furniture product search
+# 
+# Place this in your searxng volume/config directory
+# Usually: ./searxng/settings.yml or /etc/searxng/settings.yml
+
+use_default_settings: true
+
+general:
+  debug: false
+  instance_name: "Furniture Search"
+  enable_metrics: false
+
+server:
+  port: 8080
+  bind_address: "0.0.0.0"
+  secret_key: "change-this-to-random-string-abc123xyz"
+  limiter: false  # Disable rate limiting for your own instance
+  image_proxy: true
+  method: "GET"
+  http_protocol_version: "1.1"
+
+search:
+  safe_search: 0
+  autocomplete: ""
+  default_lang: "en"
+  max_page: 0
+  formats:
+    - html
+    - json
+
+ui:
+  default_locale: "en"
+  query_in_title: true
+  default_theme: simple
+  center_alignment: false
+  infinite_scroll: false
+
+# IMPORTANT: Increase timeouts for slower connections
+outgoing:
+  request_timeout: 10.0       # Increased from default 3.0
+  max_request_timeout: 15.0   # Increased from default
+  pool_connections: 100
+  pool_maxsize: 20
+  enable_http2: true
+  # Uncomment if you need proxy (e.g., to avoid IP blocks)
+  # proxies:
+  #   all://:
+  #     - socks5://localhost:9050  # Tor
+  #     - http://proxy:8080
+
+# Redis caching (optional but recommended)
+# redis:
+#   url: redis://redis:6379/0
+
+# Engine configuration
+# Disable problematic engines, enable reliable ones
+engines:
+
+  # === RELIABLE ENGINES (enable these) ===
+  
+  # Google - usually works well
+  - name: google
+    engine: google
+    shortcut: g
+    disabled: false
+    timeout: 6.0
+    
+  # Bing - good alternative  
+  - name: bing
+    engine: bing
+    shortcut: b
+    disabled: false
+    timeout: 6.0
+
+  # Brave - independent index, very reliable
+  - name: brave
+    engine: brave
+    shortcut: br
+    disabled: false
+    timeout: 6.0
+
+  # Qwant - European, usually works
+  - name: qwant
+    engine: qwant
+    shortcut: qw
+    disabled: false
+    timeout: 6.0
+    categories: [general, web]
+
+  # Mojeek - independent UK search
+  - name: mojeek
+    engine: mojeek
+    shortcut: mj
+    disabled: false
+    timeout: 6.0
+
+  # === PROBLEMATIC ENGINES (disable these) ===
+  
+  # DuckDuckGo - often has connection issues
+  - name: duckduckgo
+    engine: duckduckgo
+    shortcut: ddg
+    disabled: true  # DISABLED - connection issues
+    
+  # Startpage - frequently triggers CAPTCHA
+  - name: startpage
+    engine: startpage
+    shortcut: sp
+    disabled: true  # DISABLED - CAPTCHA issues
+
+  # === IMAGE ENGINES (for product images) ===
+  
+  - name: google images
+    engine: google_images
+    shortcut: goi
+    disabled: false
+    timeout: 6.0
+    safesearch: 0
+    
+  - name: bing images
+    engine: bing_images
+    shortcut: bii
+    disabled: false
+    timeout: 6.0
+
+  # === DISABLE UNUSED ENGINES ===
+  
+  - name: google videos
+    engine: google_videos
+    shortcut: gov
+    disabled: true
+    
+  - name: youtube
+    engine: youtube_noapi
+    shortcut: yt
+    disabled: true
+
+  - name: google news
+    engine: google_news
+    shortcut: gon
+    disabled: true
+
+  - name: wikipedia
+    engine: wikipedia
+    shortcut: wp
+    disabled: true
+
+  - name: wikidata
+    engine: wikidata
+    shortcut: wd
+    disabled: true
+
+# Categories
+categories_as_tabs:
+  general:
+  images:
+
+# Plugins
+enabled_plugins:
+  - 'Hash plugin'
+  - 'Self Information'
+  - 'Tracker URL remover'
+
+disabled_plugins:
+  - 'Ahmia blacklist'
+  - 'Hostname replace'
+  - 'Open Access DOI rewrite'
+  - 'Vim-like hotkeys'
+  - 'Tor check plugin'

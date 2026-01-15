@@ -1,0 +1,821 @@
+{
+  "source": "searxng",
+  "items": [
+    {
+      "input_item": {
+        "id": 1,
+        "name": "couch",
+        "color": "greige",
+        "material": "light gray fabric",
+        "style": "simple modern",
+        "confidence": 63,
+        "position": "center",
+        "size": "medium",
+        "area_percent": 7.199999809265137,
+        "full": "a greige couch in a living room"
+      },
+      "queries": [
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) couch greige fabric",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) couch greige",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) couch fabric",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) couch"
+      ],
+      "results": [
+        {
+          "title": "Grey Fabric Sofas | John Lewis & Partners",
+          "url": "https://www.johnlewis.com/furniture-lights/sofas/sofa/grey/fabric",
+          "snippet": "Shop for Grey Fabric Sofas from our Furniture & Lights range at John Lewis & Partners.",
+          "domain": "www.johnlewis.com",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) couch greige fabric",
+          "enriched": {
+            "final_url": "https://www.johnlewis.com/furniture-lights/sofas/sofa/grey/fabric",
+            "title": null,
+            "image": null,
+            "images": [],
+            "price": null,
+            "currency": null,
+            "success": false
+          }
+        },
+        {
+          "title": "Grey Fabric Corner sofas",
+          "url": "https://www.johnlewis.com/furniture-lights/sofas/corner-sofa/grey/fabric",
+          "snippet": "Shop for Grey Corner sofas from our Furniture & Lights range at John Lewis & Partners.",
+          "domain": "www.johnlewis.com",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) couch greige fabric",
+          "enriched": {
+            "final_url": "https://www.johnlewis.com/furniture-lights/sofas/corner-sofa/grey/fabric",
+            "title": null,
+            "image": null,
+            "images": [],
+            "price": null,
+            "currency": null,
+            "success": false
+          }
+        },
+        {
+          "title": "Grey Corner Sofas | Cheap & Large Grey Corner Sofa | Wayfair.co.uk",
+          "url": "https://www.wayfair.co.uk/furniture/sb1/grey-corner-sofas-c1772823-a2483~275658.html",
+          "snippet": "The cosy & chic Grey Corner Sofa is perfect for big family gatherings. Sumptuous cushioning & sleek lines make it the ideal living room centrepiece!",
+          "domain": "www.wayfair.co.uk",
+          "thumbnail": "https://imgs.search.brave.com/IVaZJ89H1VTk93b9FjL19UU99apwAJUAxMBhdYxPQ2Q/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9hc3Nl/dHMud2ZjZG4uY29t/L2ltLzQ2MDYzOTIw/L3Jlc2l6ZS1oNjMw/LXcxMjAwJTVFY29t/cHItcjg1LzMxNzMv/MzE3MzUyNjQ2Ly5q/cGc",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) couch greige fabric",
+          "enriched": {
+            "final_url": "https://www.wayfair.co.uk/furniture/sb1/grey-corner-sofas-c1772823-a2483~275658.html",
+            "title": null,
+            "image": null,
+            "images": [],
+            "price": null,
+            "currency": null,
+            "success": false
+          }
+        },
+        {
+          "title": "PÄRUP sofa, Gunnared dark gray - IKEA",
+          "url": "https://www.ikea.com/us/en/p/paerup-sofa-gunnared-dark-gray-s49389476/",
+          "snippet": null,
+          "domain": "www.ikea.com",
+          "thumbnail": "https://imgs.search.brave.com/LnLMoYOsn825XmlNAeacPZrNIRmu7Ltqoy5hbc5-cUU/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly93d3cu/aWtlYS5jb20vdXMv/ZW4vcC9wYWVydXAt/c29mYS1ndW5uYXJl/ZC1kYXJrLWdyYXkt/czQ5Mzg5NDc2Lw",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) couch greige fabric",
+          "enriched": {
+            "final_url": "https://www.ikea.com/us/en/p/paerup-sofa-gunnared-dark-gray-s49389476/",
+            "title": "PÄRUP sofa, Gunnared dark gray  - IKEA",
+            "image": "https://www.ikea.com/us/en/images/products/paerup-sofa-gunnared-dark-gray__1041905_pe841185_s5.jpg",
+            "images": [
+              "https://www.ikea.com/us/en/images/products/paerup-sofa-gunnared-dark-gray__1041905_pe841185_s5.jpg",
+              "https://www.ikea.com/us/en/images/products/paerup-sofa-gunnared-dark-gray__1041905_pe841185_s5.jpg?f=u",
+              "https://www.ikea.com/pvid/0992137_fe001331.jpg?f=u",
+              "https://www.ikea.com/us/en/images/products/paerup-sofa-gunnared-dark-gray__0950180_pe800199_s5.jpg?f=u",
+              "https://www.ikea.com/us/en/images/products/paerup-sofa-gunnared-dark-gray__0950110_pe800219_s5.jpg?f=u"
+            ],
+            "price": "599",
+            "currency": "USD",
+            "success": true
+          }
+        },
+        {
+          "title": "Grey Couches - Modern Grey Sofas & Sectionals - IKEA",
+          "url": "https://www.ikea.com/us/en/cat/sofas-sectionals-fu003/f/gray-sofa-f-colors--10028/",
+          "snippet": "The only color a grey couch doesn’t really work with is well, grey! If you want to brighten it up, try adding throw pillows in yellow or bold colors like blue, red or green. On the other hand, if you want a more relaxed look, consider beige or natural-colored accents. Patterned cushions also go well with grey sectionals, creating a sleek and textured styling. 4 Seater sofas · Beige sofas · Black sofas · Blue sofas · Fabric couches ·",
+          "domain": "www.ikea.com",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) couch greige fabric"
+        },
+        {
+          "title": "Grey Sofa - Grey Corner Sofa - IKEA UK",
+          "url": "https://www.ikea.com/gb/en/cat/sofas-fu003/f/grey-sofa-co002/",
+          "snippet": "See our stylish grey sofas in many shapes and sizes. These versatile sofas look good almost anywhere and will stand the test of time. Shop now.",
+          "domain": "www.ikea.com",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) couch greige fabric"
+        }
+      ]
+    },
+    {
+      "input_item": {
+        "id": 2,
+        "name": "coffee table",
+        "color": "warm beige",
+        "material": "solid wood and metal; black metal frame",
+        "style": "simple modern",
+        "confidence": 63,
+        "position": "bottom-center",
+        "size": "small",
+        "area_percent": 2.700000047683716,
+        "full": "a warm beige coffee table side table with a black metal frame"
+      },
+      "queries": [
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) coffee table warm beige wood metal \"black metal frame\"",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) coffee table warm beige",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) coffee table wood metal \"black metal frame\"",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) coffee table"
+      ],
+      "results": [
+        {
+          "title": "Metal Wood Coffee Tables You'll Love | Wayfair.co.uk",
+          "url": "https://www.wayfair.co.uk/furniture/sb2/metal-wood-coffee-tables-c225536-a3725~442166-a75128~274127.html",
+          "snippet": "This coffee table is a great option ... style. Inspired by mid-century design, this piece features steel hairpin legs with a black finish, and is topped with a manufactured wood surface for a striking mixed-material look...",
+          "domain": "www.wayfair.co.uk",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) coffee table warm beige wood metal \"black metal frame\"",
+          "enriched": {
+            "final_url": "https://www.wayfair.co.uk/furniture/sb2/metal-wood-coffee-tables-c225536-a3725~442166-a75128~274127.html",
+            "title": null,
+            "image": null,
+            "images": [],
+            "price": null,
+            "currency": null,
+            "success": false
+          }
+        },
+        {
+          "title": "Black Coffee Tables | Small Black Coffee Table",
+          "url": "https://www.wayfair.co.uk/furniture/sb1/black-coffee-tables-c225536-a75130~274155.html",
+          "snippet": "STURDY BUILD: Combines a strong black metal frame with a scratch-resistant wood composite top for everyday durability. FINISH OPTIONS: Choose from two stylish colours to match your interior: Warm Walnut or Modern Grey.",
+          "domain": "www.wayfair.co.uk",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) coffee table warm beige wood metal \"black metal frame\"",
+          "enriched": {
+            "final_url": "https://www.wayfair.co.uk/furniture/sb1/black-coffee-tables-c225536-a75130~274155.html",
+            "title": null,
+            "image": null,
+            "images": [],
+            "price": null,
+            "currency": null,
+            "success": false
+          }
+        },
+        {
+          "title": "Black Wood Coffee Tables You'll Love | Wayfair.co.uk",
+          "url": "https://www.wayfair.co.uk/furniture/sb2/black-wood-coffee-tables-c225536-a3725~442166-a75130~274155.html",
+          "snippet": "Crafted with a robust black metal frame that ensures lasting durability and stability, these tables are topped with a high-quality, smooth wood-effect top in your choice of finish.",
+          "domain": "www.wayfair.co.uk",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) coffee table warm beige wood metal \"black metal frame\"",
+          "enriched": {
+            "final_url": "https://www.wayfair.co.uk/furniture/sb2/black-wood-coffee-tables-c225536-a3725~442166-a75130~274155.html",
+            "title": null,
+            "image": null,
+            "images": [],
+            "price": null,
+            "currency": null,
+            "success": false
+          }
+        },
+        {
+          "title": "Black Metal Frame Bedside Tables You'll Love | Wayfair.co.uk",
+          "url": "https://www.wayfair.co.uk/furniture/sb2/black-metal-frame-bedside-tables-c224790-a156~219-a2309~4764.html",
+          "snippet": "With warm wooden tones and black metal highlights, this bedside table is a stylish addition to any room. It features a drawer and cut-out shelf along with a sturdy surface, making it ideal for use as a coffee or side table as well as a bedside table.",
+          "domain": "www.wayfair.co.uk",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) coffee table warm beige wood metal \"black metal frame\"",
+          "enriched": {
+            "final_url": "https://www.wayfair.co.uk/furniture/sb2/black-metal-frame-bedside-tables-c224790-a156~219-a2309~4764.html",
+            "title": null,
+            "image": null,
+            "images": [],
+            "price": null,
+            "currency": null,
+            "success": false
+          }
+        },
+        {
+          "title": "Coffee Table Black Legs | Wayfair.co.uk",
+          "url": "https://www.wayfair.co.uk/keyword.php?keyword=coffee+table+black+legs",
+          "snippet": "STURDY BUILD: Combines a strong black metal frame with a scratch-resistant wood composite top for everyday durability. FINISH OPTIONS: Choose from two stylish colours to match your interior: Warm Walnut or Modern Grey.",
+          "domain": "www.wayfair.co.uk",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) coffee table warm beige wood metal \"black metal frame\""
+        },
+        {
+          "title": "Black Glass Coffee Tables You'll Love | Wayfair.co.uk",
+          "url": "https://www.wayfair.co.uk/furniture/sb2/black-glass-coffee-tables-c225536-a3725~9670-a75130~274155.html",
+          "snippet": "Metal Coffee Tables With Storage Function · All Sustainable Products Industrial Tv Stands & Entertainment Centers · Soft-Close Drawers Alpen Home Tv Stands & Entertainment Centers · Made In Italy Tray Top End & Side Tables · End & Side Tables (Frame Material: Wood, Country Of Origin: Made In Italy) Assembly Tools Included Coastal Pine Coffee Tables · Assembly Required Mould/Mildew Resistant Mirrored Side Tables · Beige Storage End & Side Tables ·",
+          "domain": "www.wayfair.co.uk",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) coffee table warm beige wood metal \"black metal frame\""
+        }
+      ]
+    },
+    {
+      "input_item": {
+        "id": 3,
+        "name": "armchair",
+        "color": "soft black",
+        "material": "wood frame; soft black leather upholstery",
+        "style": "simple elegant",
+        "confidence": 58,
+        "position": "bottom-left",
+        "size": "medium",
+        "area_percent": 4.0,
+        "full": "a soft black armchair chair"
+      },
+      "queries": [
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) armchair soft black wood leather black frame",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) armchair soft black",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) armchair wood leather black frame",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) armchair"
+      ],
+      "results": [
+        {
+          "title": "MORABO armchair, Grann/Bomstad black/wood - IKEA",
+          "url": "https://www.ikea.com/us/en/p/morabo-armchair-grann-bomstad-black-wood-s39316602/",
+          "snippet": null,
+          "domain": "www.ikea.com",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) armchair soft black wood leather black frame",
+          "enriched": {
+            "final_url": "https://www.ikea.com/us/en/p/morabo-armchair-grann-bomstad-black-wood-s39316602/",
+            "title": "MORABO armchair, Grann/Bomstad black/wood  - IKEA",
+            "image": "https://www.ikea.com/us/en/images/products/morabo-armchair-grann-bomstad-black-wood__0320834_pe514839_s5.jpg",
+            "images": [
+              "https://www.ikea.com/us/en/images/products/morabo-armchair-grann-bomstad-black-wood__0320834_pe514839_s5.jpg",
+              "https://www.ikea.com/us/en/images/products/morabo-armchair-grann-bomstad-black-wood__0320834_pe514839_s5.jpg?f=u",
+              "https://www.ikea.com/us/en/images/products/morabo-armchair-grann-bomstad-black-wood__0812542_pe772020_s5.jpg?f=u",
+              "https://www.ikea.com/us/en/images/products/morabo-armchair-grann-bomstad-black-wood__0813413_ph166315_s5.jpg?f=u",
+              "https://www.ikea.com/us/en/images/products/morabo-armchair-grann-bomstad-black-wood__0840513_pe596356_s5.jpg?f=u"
+            ],
+            "price": "699",
+            "currency": "USD",
+            "success": true
+          }
+        },
+        {
+          "title": "Black Wood Armchairs & Accent Chairs You'll Love | Wayfair.co.uk",
+          "url": "https://www.wayfair.co.uk/furniture/sb2/black-wood-armchairs-accent-chairs-c493383-a470~813-a75220~274814.html",
+          "snippet": "Tue Jul 15 2025 ... A compact armchair that works well in both living rooms and bedrooms. It features a buttoned back, faux leather upholstery, and simple black wooden legs, with subtly curved rear legs that add a touch of character to the design.",
+          "domain": "www.wayfair.co.uk",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) armchair soft black wood leather black frame",
+          "enriched": {
+            "final_url": "https://www.wayfair.co.uk/furniture/sb2/black-wood-armchairs-accent-chairs-c493383-a470~813-a75220~274814.html",
+            "title": null,
+            "image": null,
+            "images": [],
+            "price": null,
+            "currency": null,
+            "success": false
+          }
+        },
+        {
+          "title": "Black Faux Leather Armchairs & Accent Chairs You'll Love | Wayfair.co.uk",
+          "url": "https://www.wayfair.co.uk/furniture/sb2/black-faux-leather-armchairs-accent-chairs-c493383-a471~274880-a75218~274794.html",
+          "snippet": "Elevate your home with this mid-century modern accent chair, featuring a solid wood frame and high-density sponge cushions. Soft PU leather upholstery and ergonomic armrests provide superior comfort.",
+          "domain": "www.wayfair.co.uk",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) armchair soft black wood leather black frame",
+          "enriched": {
+            "final_url": "https://www.wayfair.co.uk/furniture/sb2/black-faux-leather-armchairs-accent-chairs-c493383-a471~274880-a75218~274794.html",
+            "title": null,
+            "image": null,
+            "images": [],
+            "price": null,
+            "currency": null,
+            "success": false
+          }
+        },
+        {
+          "title": "Wood And Leather Chair | Wayfair.co.uk",
+          "url": "https://www.wayfair.co.uk/keyword.php?keyword=wood+and+leather+chair",
+          "snippet": "Our Jodi brown faux leather armchair ticks off all the design boxes! This gorgeously soft chair will be a perfect addition to your living room furniture. The straight lines keep this design modern but the stylish faux leather fabric gives it ...",
+          "domain": "www.wayfair.co.uk",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) armchair soft black wood leather black frame",
+          "enriched": {
+            "final_url": "https://www.wayfair.co.uk/keyword.php?keyword=wood+and+leather+chair",
+            "title": null,
+            "image": null,
+            "images": [],
+            "price": null,
+            "currency": null,
+            "success": false
+          }
+        },
+        {
+          "title": "Black Armchairs & Accent Chairs | Black Occasional Chair",
+          "url": "https://www.wayfair.co.uk/furniture/sb1/black-armchairs-accent-chairs-c493383-a75220~274814.html",
+          "snippet": "Comes complete with tufting on the back for extra style.- Retro armchair featuring deep tufting on the high-rise back and piping on the arms – a timeless look which will never go out of style; - Wooden frame and legs for strong support; - Thick foam padding and pocket springs for comfort and support; - Fluffy teddy fleece offers a soft and cosy surface; - Maximum weight 160kg, assembly required; - Material: Teddy Fleece (100% Polyester), Wood, Sponge; - Overall Dimension: 74W x 86D x 102Hcm; - Seat Size: 53D x 48.5Wcm; - Seat to Floor Height: 47cm; - Back Size: 67W x 63H x 15Dcm; - Armrest to Floor Height: 57cm; - Weight Capacity: 160kg; - Item Label: 833-695V73GY;",
+          "domain": "www.wayfair.co.uk",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) armchair soft black wood leather black frame"
+        },
+        {
+          "title": "Metal Frame Leather Chair | Wayfair.co.uk",
+          "url": "https://www.wayfair.co.uk/keyword.php?keyword=metal+frame+leather+chair",
+          "snippet": "Our Jodi brown faux leather armchair ticks off all the design boxes! This gorgeously soft chair will be a perfect addition to your living room furniture. The straight lines keep this design modern but the stylish faux leather fabric gives it ...",
+          "domain": "www.wayfair.co.uk",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) armchair soft black wood leather black frame"
+        }
+      ]
+    },
+    {
+      "input_item": {
+        "id": 4,
+        "name": "tv stand",
+        "color": "walnut",
+        "material": "solid wood",
+        "style": "simple modern",
+        "confidence": 57,
+        "position": "bottom-right",
+        "size": "small",
+        "area_percent": 3.299999952316284,
+        "full": "a walnut tv stand"
+      },
+      "queries": [
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) tv stand walnut wood",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) tv stand walnut",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) tv stand wood",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) tv stand"
+      ],
+      "results": [
+        {
+          "title": "Dark Walnut Tv Stand | Wayfair.co.uk",
+          "url": "https://www.wayfair.co.uk/keyword.php?keyword=dark+walnut+tv+stand",
+          "snippet": "Finished with a dark walnut effect and supported by a sleek black base, it presents a clean, contemporary aesthetic. Featuring three integrated drawers, this unit provides valuable concealed storage for media accessories, gaming consoles, or ...",
+          "domain": "www.wayfair.co.uk",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) tv stand walnut wood",
+          "enriched": {
+            "final_url": "https://www.wayfair.co.uk/keyword.php?keyword=dark+walnut+tv+stand",
+            "title": null,
+            "image": null,
+            "images": [],
+            "price": null,
+            "currency": null,
+            "success": false
+          }
+        },
+        {
+          "title": "STOCKHOLM TV unit, walnut veneer, 63x153/4x195/8",
+          "url": "https://www.ikea.com/us/en/p/stockholm-tv-unit-walnut-veneer-60566236/",
+          "snippet": "Turn your living room into the perfect space to showcase your style. With its timeless furniture, soft textiles and precious details, the STOCKHOLM 2025 collection has everything you need to add a touch of Scandinavian design to your home · Bring your ideas to life with special discounts, ...",
+          "domain": "www.ikea.com",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) tv stand walnut wood",
+          "enriched": {
+            "final_url": "https://www.ikea.com/us/en/cat/stockholm-living-room-700627/",
+            "title": "STOCKHOLM living room",
+            "image": "https://www.ikea.com/us/en/range-categorisation/images/stockholm-living-room-700627.jpeg",
+            "images": [
+              "https://www.ikea.com/us/en/range-categorisation/images/stockholm-living-room-700627.jpeg",
+              "https://www.ikea.com/us/en/images/products/stockholm-2025-sofa-sundhamn-beige__1362734_pe955310_s5.jpg?f=xxs",
+              "https://www.ikea.com/us/en/images/products/stockholm-2025-sofa-sundhamn-beige__1421377_ph203023_s5.jpg?f=xxs",
+              "https://www.ikea.com/us/en/images/products/stockholm-2025-tv-unit-with-sliding-doors-oak-veneer__1397700_pe967721_s5.jpg?f=xxs",
+              "https://www.ikea.com/us/en/images/products/stockholm-2025-tv-unit-with-sliding-doors-oak-veneer__1425266_ph203047_s5.jpg?f=xxs"
+            ],
+            "price": "20251999.001999.0046",
+            "currency": "TRY",
+            "success": true
+          }
+        },
+        {
+          "title": "Solid wood Walnut TV Stands & Entertainment Centers You'll Love | Wayfair.co.uk",
+          "url": "https://www.wayfair.co.uk/furniture/sb2/solid-wood-walnut-tv-stands-entertainment-centers-c1855391-a136030~450008-a153938~508446.html",
+          "snippet": "Ample Storage Space for Your Entertainment Essentials Measuring 130 cm in width, 46 cm in height, and 40 cm in depth, this TV stand offers ample storage space for all your entertainment essentials.",
+          "domain": "www.wayfair.co.uk",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) tv stand walnut wood",
+          "enriched": {
+            "final_url": "https://www.wayfair.co.uk/furniture/sb2/solid-wood-walnut-tv-stands-entertainment-centers-c1855391-a136030~450008-a153938~508446.html",
+            "title": null,
+            "image": null,
+            "images": [],
+            "price": null,
+            "currency": null,
+            "success": false
+          }
+        },
+        {
+          "title": "Black Walnut TV Stands & Entertainment Centers You'll Love | Wayfair.co.uk",
+          "url": "https://www.wayfair.co.uk/furniture/sb2/black-walnut-tv-stands-entertainment-centers-c1855391-a52~45-a136030~450008.html",
+          "snippet": "This entertainment center, crafted from solid walnut wood, provides a modern yet retro design perfect for any home. The spacious design easily houses your entertainment system. Robert.",
+          "domain": "www.wayfair.co.uk",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) tv stand walnut wood",
+          "enriched": {
+            "final_url": "https://www.wayfair.co.uk/furniture/sb2/black-walnut-tv-stands-entertainment-centers-c1855391-a52~45-a136030~450008.html",
+            "title": null,
+            "image": null,
+            "images": [],
+            "price": null,
+            "currency": null,
+            "success": false
+          }
+        },
+        {
+          "title": "Wood TV Stands & Entertainment Centers | Wood TV Console",
+          "url": "https://www.wayfair.co.uk/furniture/sb1/wood-tv-stands-entertainment-centers-c1855391-a6377~442380.html",
+          "snippet": "Supported by robust black carbon steel legs, the unit stands stable even when fully loaded, and its walnut finish offers a polished look that complements wood, metal, or fabric furniture. It’s not just a TV stand; it’s a solution for a clutter-free entertainment space.",
+          "domain": "www.wayfair.co.uk",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) tv stand walnut wood"
+        },
+        {
+          "title": "Brown Walnut TV Stands & Entertainment Centers You'll Love | Wayfair.co.uk",
+          "url": "https://www.wayfair.co.uk/furniture/sb2/brown-walnut-tv-stands-entertainment-centers-c1855391-a52~272078-a136030~450008.html",
+          "snippet": "Ample Storage Space for Your Entertainment Essentials Measuring 130 cm in width, 46 cm in height, and 40 cm in depth, this TV stand offers ample storage space for all your entertainment essentials.",
+          "domain": "www.wayfair.co.uk",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) tv stand walnut wood"
+        }
+      ]
+    },
+    {
+      "input_item": {
+        "id": 5,
+        "name": "dresser",
+        "color": "walnut",
+        "material": "wood",
+        "style": "simple modern",
+        "confidence": 53,
+        "position": "bottom-right",
+        "size": "small",
+        "area_percent": 3.299999952316284,
+        "full": "a walnut dresser with a plant in it"
+      },
+      "queries": [
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) dresser walnut wood",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) dresser walnut",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) dresser wood",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) dresser"
+      ],
+      "results": [
+        {
+          "title": "RÅDMANSÖ 6-drawer dresser, brown walnut effect, 625/8x187/8x317/8\" - IKEA",
+          "url": "https://www.ikea.com/us/en/p/radmansoe-6-drawer-dresser-brown-walnut-effect-40593839/",
+          "snippet": null,
+          "domain": "www.ikea.com",
+          "thumbnail": "",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) dresser walnut wood",
+          "enriched": {
+            "final_url": "https://www.ikea.com/us/en/p/radmansoe-6-drawer-dresser-brown-walnut-effect-40593839/",
+            "title": "RÅDMANSÖ 6-drawer dresser, brown walnut effect, 625/8x187/8x317/8\"  - IKEA",
+            "image": "https://www.ikea.com/us/en/images/products/radmansoe-6-drawer-dresser-brown-walnut-effect__1384142_pe962859_s5.jpg",
+            "images": [
+              "https://www.ikea.com/us/en/images/products/radmansoe-6-drawer-dresser-brown-walnut-effect__1384142_pe962859_s5.jpg",
+              "https://www.ikea.com/us/en/images/products/radmansoe-6-drawer-dresser-brown-walnut-effect__1384142_pe962859_s5.jpg?f=u",
+              "https://www.ikea.com/us/en/images/products/radmansoe-6-drawer-dresser-brown-walnut-effect__1416939_pe975715_s5.jpg?f=u",
+              "https://www.ikea.com/us/en/images/products/radmansoe-6-drawer-dresser-brown-walnut-effect__1416940_pe975716_s5.jpg?f=u",
+              "https://www.ikea.com/us/en/images/products/radmansoe-6-drawer-dresser-brown-walnut-effect__1533868_pe1016063_s5.jpg?f=u"
+            ],
+            "price": "349.99",
+            "currency": "USD",
+            "success": true
+          }
+        },
+        {
+          "title": "RÅDMANSÖ 5-drawer dresser, brown walnut effect, 271/2x187/8x52\" - IKEA",
+          "url": "https://www.ikea.com/us/en/p/radmansoe-5-drawer-dresser-brown-walnut-effect-60593838/",
+          "snippet": null,
+          "domain": "www.ikea.com",
+          "thumbnail": "https://imgs.search.brave.com/qhuPropg_ctgIBsXvJusiY31G34qvmOoMjVhnjJuI-k/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly93d3cu/aWtlYS5jb20vdXMv/ZW4vaW1hZ2VzL3By/b2R1Y3RzL3JhZG1h/bnNvZS01LWRyYXdl/ci1kcmVzc2VyLWJy/b3duLXdhbG51dC1l/ZmZlY3RfXzEzODQx/MzlfcGU5NjI4NThf/czUuanBn",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) dresser walnut wood",
+          "enriched": {
+            "final_url": "https://www.ikea.com/us/en/p/radmansoe-5-drawer-dresser-brown-walnut-effect-60593838/",
+            "title": "RÅDMANSÖ 5-drawer dresser, brown walnut effect, 271/2x187/8x52\"  - IKEA",
+            "image": "https://www.ikea.com/us/en/images/products/radmansoe-5-drawer-dresser-brown-walnut-effect__1384139_pe962858_s5.jpg",
+            "images": [
+              "https://www.ikea.com/us/en/images/products/radmansoe-5-drawer-dresser-brown-walnut-effect__1384139_pe962858_s5.jpg",
+              "https://www.ikea.com/us/en/images/products/radmansoe-5-drawer-dresser-brown-walnut-effect__1384139_pe962858_s5.jpg?f=u",
+              "https://www.ikea.com/us/en/images/products/radmansoe-5-drawer-dresser-brown-walnut-effect__1416931_pe975708_s5.jpg?f=u",
+              "https://www.ikea.com/us/en/images/products/radmansoe-5-drawer-dresser-brown-walnut-effect__1416933_pe975712_s5.jpg?f=u",
+              "https://www.ikea.com/us/en/images/products/radmansoe-5-drawer-dresser-brown-walnut-effect__1416932_pe975709_s5.jpg?f=u"
+            ],
+            "price": "299.99",
+            "currency": "USD",
+            "success": true
+          }
+        },
+        {
+          "title": "RÅDMANSÖ 3-drawer dresser, brown walnut effect, 353/8x187/8x313/4\" - IKEA",
+          "url": "https://www.ikea.com/us/en/p/radmansoe-3-drawer-dresser-brown-walnut-effect-80593837/",
+          "snippet": null,
+          "domain": "www.ikea.com",
+          "thumbnail": "https://imgs.search.brave.com/_S7YFRGp48D92DO8xzbGQeo7w3X1EMKB8MsADtkPyxI/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly93d3cu/aWtlYS5jb20vdXMv/ZW4vaW1hZ2VzL3By/b2R1Y3RzL3JhZG1h/bnNvZS0zLWRyYXdl/ci1kcmVzc2VyLWJy/b3duLXdhbG51dC1l/ZmZlY3RfXzEzODQx/MzhfcGU5NjI4NTdf/czUuanBn",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) dresser walnut wood",
+          "enriched": {
+            "final_url": "https://www.ikea.com/us/en/p/radmansoe-3-drawer-dresser-brown-walnut-effect-80593837/",
+            "title": "RÅDMANSÖ 3-drawer dresser, brown walnut effect, 353/8x187/8x313/4\"  - IKEA",
+            "image": "https://www.ikea.com/us/en/images/products/radmansoe-3-drawer-dresser-brown-walnut-effect__1384138_pe962857_s5.jpg",
+            "images": [
+              "https://www.ikea.com/us/en/images/products/radmansoe-3-drawer-dresser-brown-walnut-effect__1384138_pe962857_s5.jpg",
+              "https://www.ikea.com/us/en/images/products/radmansoe-3-drawer-dresser-brown-walnut-effect__1384138_pe962857_s5.jpg?f=u",
+              "https://www.ikea.com/us/en/images/products/radmansoe-3-drawer-dresser-brown-walnut-effect__1416923_pe975700_s5.jpg?f=u",
+              "https://www.ikea.com/us/en/images/products/radmansoe-3-drawer-dresser-brown-walnut-effect__1416925_pe975704_s5.jpg?f=u",
+              "https://www.ikea.com/us/en/images/products/radmansoe-3-drawer-dresser-brown-walnut-effect__1416924_pe975701_s5.jpg?f=u"
+            ],
+            "price": "229.99",
+            "currency": "USD",
+            "success": true
+          }
+        },
+        {
+          "title": "STOCKHOLM cabinet with 2 drawers, walnut veneer, 353/8x421/8\" - IKEA",
+          "url": "https://www.ikea.com/us/en/p/stockholm-cabinet-with-2-drawers-walnut-veneer-80239724/",
+          "snippet": null,
+          "domain": "www.ikea.com",
+          "thumbnail": "https://imgs.search.brave.com/zS7Rzz7SnZu7_v1QjzdLKfsmoZNlnk13K-RYnBM1QbU/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly93d3cu/aWtlYS5jb20vdXMv/ZW4vcC9zdG9ja2hv/bG0tY2FiaW5ldC13/aXRoLTItZHJhd2Vy/cy13YWxudXQtdmVu/ZWVyLTgwMjM5NzI0/Lw",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) dresser walnut wood",
+          "enriched": {
+            "final_url": "https://www.ikea.com/us/en/p/stockholm-cabinet-with-2-drawers-walnut-veneer-80239724/",
+            "title": "STOCKHOLM cabinet with 2 drawers, walnut veneer, 353/8x421/8\"  - IKEA",
+            "image": "https://www.ikea.com/us/en/images/products/stockholm-cabinet-with-2-drawers-walnut-veneer__0625066_pe692087_s5.jpg",
+            "images": [
+              "https://www.ikea.com/us/en/images/products/stockholm-cabinet-with-2-drawers-walnut-veneer__0625066_pe692087_s5.jpg",
+              "https://www.ikea.com/us/en/images/products/stockholm-cabinet-with-2-drawers-walnut-veneer__0625066_pe692087_s5.jpg?f=u",
+              "https://www.ikea.com/us/en/images/products/stockholm-cabinet-with-2-drawers-walnut-veneer__0848506_pe560689_s5.jpg?f=u",
+              "https://www.ikea.com/us/en/images/products/stockholm-cabinet-with-2-drawers-walnut-veneer__0848485_pe365378_s5.jpg?f=u",
+              "https://www.ikea.com/us/en/images/products/stockholm-cabinet-with-2-drawers-walnut-veneer__0259377_pe403836_s5.jpg?f=u"
+            ],
+            "price": "499",
+            "currency": "USD",
+            "success": true
+          }
+        },
+        {
+          "title": "RÅDMANSÖ wardrobe, brown walnut effect, 465/8x253/8x745/8\" - IKEA",
+          "url": "https://www.ikea.com/us/en/p/radmansoe-wardrobe-brown-walnut-effect-00593841/",
+          "snippet": null,
+          "domain": "www.ikea.com",
+          "thumbnail": "https://imgs.search.brave.com/B199WSIDAmYfEey6yDq-mF5c_BHcGJQa6IoYWlDqsto/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly93d3cu/aWtlYS5jb20vdXMv/ZW4vaW1hZ2VzL3By/b2R1Y3RzL3JhZG1h/bnNvZS13YXJkcm9i/ZS1icm93bi13YWxu/dXQtZWZmZWN0X18x/Mzg0MTQwX3BlOTYy/ODYxX3M1LmpwZw",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) dresser walnut wood"
+        },
+        {
+          "title": "STOCKHOLM Sideboard, walnut veneer, 63x31 7/8\" - IKEA",
+          "url": "https://www.ikea.com/us/en/p/stockholm-sideboard-walnut-veneer-40239721/",
+          "snippet": null,
+          "domain": "www.ikea.com",
+          "thumbnail": "https://imgs.search.brave.com/Dx4QeMZ-euhljOFjcGn2LZIL2EwpyRJQwKMrcxFwcTM/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly93d3cu/aWtlYS5jb20vdXMv/ZW4vcC9zdG9ja2hv/bG0tc2lkZWJvYXJk/LXdhbG51dC12ZW5l/ZXItNDAyMzk3MjEv",
+          "query_used": "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) dresser walnut wood"
+        }
+      ]
+    },
+    {
+      "input_item": {
+        "id": 6,
+        "name": "floor lamp",
+        "color": "white gray",
+        "material": "metal; black metal base",
+        "style": "simple modern",
+        "confidence": 50,
+        "position": "center",
+        "size": "medium",
+        "area_percent": 1.7999999523162842,
+        "full": "a white gray lamp sitting on a wooden floor"
+      },
+      "queries": [
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) floor lamp white gray metal \"black metal frame\"",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) floor lamp white gray",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) floor lamp metal \"black metal frame\"",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) floor lamp"
+      ],
+      "results": []
+    },
+    {
+      "input_item": {
+        "id": 7,
+        "name": "rug",
+        "color": "khaki",
+        "material": "natural jute",
+        "style": "natural jute",
+        "confidence": 50,
+        "position": "bottom-center",
+        "size": "medium",
+        "area_percent": 4.800000190734863,
+        "full": "a khaki rug carpet in a living room"
+      },
+      "queries": [
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) rug khaki jute",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) rug khaki",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) rug jute",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) rug"
+      ],
+      "results": []
+    },
+    {
+      "input_item": {
+        "id": 8,
+        "name": "sofa",
+        "color": "greige",
+        "material": "light gray fabric",
+        "style": "simple modern",
+        "confidence": 46,
+        "position": "center",
+        "size": "medium",
+        "area_percent": 7.099999904632568,
+        "full": "a greige sofa and a coffee table in a living room"
+      },
+      "queries": [
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) sofa greige fabric",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) sofa greige",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) sofa fabric",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) sofa"
+      ],
+      "results": []
+    },
+    {
+      "input_item": {
+        "id": 9,
+        "name": "armchair",
+        "color": "soft black",
+        "material": "wood frame; soft black leather upholstery",
+        "style": "simple elegant",
+        "confidence": 44,
+        "position": "bottom-left",
+        "size": "medium",
+        "area_percent": 3.9000000953674316,
+        "full": "a soft black armchair chair"
+      },
+      "queries": [
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) armchair soft black wood leather black frame",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) armchair soft black",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) armchair wood leather black frame",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) armchair"
+      ],
+      "results": []
+    },
+    {
+      "input_item": {
+        "id": 10,
+        "name": "plant",
+        "color": "light walnut",
+        "material": "wood (as detected); white vase",
+        "style": "simple elegant",
+        "confidence": 37,
+        "position": "center",
+        "size": "small",
+        "area_percent": 1.399999976158142,
+        "full": "a light walnut plant in a white vase on a coffee table"
+      },
+      "queries": [
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) plant light walnut wood",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) plant light walnut",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) plant wood",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) plant"
+      ],
+      "results": []
+    },
+    {
+      "input_item": {
+        "id": 11,
+        "name": "table lamp",
+        "color": "white gray",
+        "material": "metal; black metal base",
+        "style": "simple elegant",
+        "confidence": 35,
+        "position": "center",
+        "size": "medium",
+        "area_percent": 1.7999999523162842,
+        "full": "a white gray lamp table lamp on a wooden floor"
+      },
+      "queries": [
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) table lamp white gray metal \"black metal frame\"",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) table lamp white gray",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) table lamp metal \"black metal frame\"",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) table lamp"
+      ],
+      "results": []
+    },
+    {
+      "input_item": {
+        "id": 12,
+        "name": "rug",
+        "color": "khaki",
+        "material": "natural jute",
+        "style": "natural jute",
+        "confidence": 33,
+        "position": "bottom-center",
+        "size": "medium",
+        "area_percent": 4.699999809265137,
+        "full": "a khaki rug carpet in a living room"
+      },
+      "queries": [
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) rug khaki jute",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) rug khaki",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) rug jute",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) rug"
+      ],
+      "results": []
+    },
+    {
+      "input_item": {
+        "id": 13,
+        "name": "wall art",
+        "color": "light gray",
+        "material": "mixed colors (blue, green, gold)",
+        "style": "abstract (blue/green/gold mix)",
+        "confidence": 31,
+        "position": "center",
+        "size": "small",
+        "area_percent": 2.9000000953674316,
+        "full": "a light gray artwork"
+      },
+      "queries": [
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) wall art light gray",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) wall art"
+      ],
+      "results": []
+    },
+    {
+      "input_item": {
+        "id": 14,
+        "name": "plant",
+        "color": "light walnut",
+        "material": "single stem (wheat) in vase (as detected)",
+        "style": "brown and blue (as detected)",
+        "confidence": 29,
+        "position": "center",
+        "size": "small",
+        "area_percent": 0.800000011920929,
+        "full": "a light walnut plant in a white vase on a grey couch"
+      },
+      "queries": [
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) plant light walnut",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) plant"
+      ],
+      "results": []
+    },
+    {
+      "input_item": {
+        "id": 15,
+        "name": "dresser",
+        "color": "walnut",
+        "material": "wood",
+        "style": "simple modern",
+        "confidence": 28,
+        "position": "bottom-right",
+        "size": "small",
+        "area_percent": 3.200000047683716,
+        "full": "a walnut dresser with a plant in it"
+      },
+      "queries": [
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) dresser walnut wood",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) dresser walnut",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) dresser wood",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) dresser"
+      ],
+      "results": []
+    },
+    {
+      "input_item": {
+        "id": 16,
+        "name": "plant",
+        "color": "hunter green",
+        "material": "wood (as detected)",
+        "style": "simple elegant",
+        "confidence": 27,
+        "position": "middle-right",
+        "size": "medium",
+        "area_percent": 4.699999809265137,
+        "full": "a hunter green plant sitting on top of a tv stand"
+      },
+      "queries": [
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) plant hunter green wood",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) plant hunter green",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) plant wood",
+        "(site:ikea.com OR site:wayfair.co.uk OR site:johnlewis.com) plant"
+      ],
+      "results": []
+    }
+  ],
+  "meta": {
+    "searx": "http://localhost:8080",
+    "sites": [
+      "ikea.com",
+      "wayfair.co.uk",
+      "johnlewis.com"
+    ],
+    "blocked": [
+      "pinterest.com",
+      "facebook.com",
+      "instagram.com",
+      "twitter.com"
+    ],
+    "enrich": true,
+    "fetch_top": 4,
+    "language": "en"
+  }
+}

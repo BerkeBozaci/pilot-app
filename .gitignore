@@ -2,3 +2,7 @@
 .streamlit/
 .streamlit/secrets.toml
 *.toml
+.checkpoints/
+*.pth
+*.pt
+/claude-merge
