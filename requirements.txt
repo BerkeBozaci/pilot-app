@@ -4,6 +4,7 @@ Pillow>=10.0.0
 python-dotenv>=1.0.0
 openai>=1.0.0
 requests>=2.28.0
-
-
+torch
+google-genai 
+google-auth
 replicate>=0.15.0
