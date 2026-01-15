@@ -8,3 +8,5 @@ torch
 google-genai 
 google-auth
 replicate>=0.15.0
+transformers
+beautifulsoup4
